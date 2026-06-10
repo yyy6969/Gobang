@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(Gonbal_My_Game LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Qml Widgets QuickWidgets)
 
 qt_standard_project_setup()
 
@@ -19,6 +19,7 @@ target_link_libraries(Gonbal_My_Game
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt::QuickWidgets
 )
 
 include(GNUInstallDirs)
