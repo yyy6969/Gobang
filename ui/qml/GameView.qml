@@ -55,6 +55,19 @@ Rectangle {
         }
     }
 
+
+
+    // 预览棋子
+        Rectangle {
+            id: preview
+            width: cellSize * 0.8
+            height: width
+            radius: width/2
+            opacity: 0.5
+            visible: false
+        }
+
+
     // 棋子层
     Item {
         id: piecesLayer
@@ -82,28 +95,50 @@ Rectangle {
     }
 
     // 鼠标点击区域----------与棋盘严格对齐
+
     MouseArea {
         x: boardX - cellSize/2
         y: boardY - cellSize/2
         width: (boardSize-1) * cellSize + cellSize
         height: (boardSize-1) * cellSize + cellSize
         enabled: !game.gameOver
+        hoverEnabled: true
+
         onClicked: function(mouse) {
-               // 相对于 MouseArea 的坐标 (0,0) 是其左上角
-               // 第一个交叉点位于 (cellSize/2, cellSize/2) 处
-               var crossX = mouse.x - cellSize/2
-               var crossY = mouse.y - cellSize/2
-               var col = Math.round(crossX / cellSize)
-               var row = Math.round(crossY / cellSize)
+            var crossX = mouse.x - cellSize/2
+            var crossY = mouse.y - cellSize/2
+            var col = Math.round(crossX / cellSize)
+            var row = Math.round(crossY / cellSize)
+            if (row >= 0 && row < boardSize && col >= 0 && col < boardSize)
+                game.placePiece(row, col)
+            pieceRepeater.model = 0
+            pieceRepeater.model = boardSize * boardSize
+        }
 
-               if (row >= 0 && row < boardSize && col >= 0 && col < boardSize)
-                   game.placePiece(row, col)
+        onPositionChanged: function(mouse) {
+            // 现在与 onClicked 完全一致
+            var crossX = mouse.x - cellSize/2
+            var crossY = mouse.y - cellSize/2
+            var col = Math.round(crossX / cellSize)
+            var row = Math.round(crossY / cellSize)
 
-               // 刷新棋子
-               pieceRepeater.model = 0
-               pieceRepeater.model = boardSize * boardSize
-           }
+            if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
+                if (game.pieceAt(row, col) === 0 && !game.gameOver) {
+                    preview.x = boardX + col * cellSize - preview.width/2
+                    preview.y = boardY + row * cellSize - preview.height/2
+                    preview.color = game.currentPlayer === 0 ? "black" : "white"
+                    preview.visible = true
+                    return
+                }
+            }
+            preview.visible = false
+        }
+
+        onExited: {
+            preview.visible = false
+        }
     }
+
 
     // 游戏结束遮罩
     Rectangle {
