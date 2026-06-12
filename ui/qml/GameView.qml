@@ -96,46 +96,61 @@ Rectangle {
 
     // 鼠标点击区域----------与棋盘严格对齐
 
-    MouseArea {
+    Item {
+        id: inputArea
+
         x: boardX - cellSize/2
         y: boardY - cellSize/2
         width: (boardSize-1) * cellSize + cellSize
         height: (boardSize-1) * cellSize + cellSize
-        enabled: !game.gameOver
-        hoverEnabled: true
 
-        onClicked: function(mouse) {
-            var crossX = mouse.x - cellSize/2
-            var crossY = mouse.y - cellSize/2
-            var col = Math.round(crossX / cellSize)
-            var row = Math.round(crossY / cellSize)
-            if (row >= 0 && row < boardSize && col >= 0 && col < boardSize)
-                game.placePiece(row, col)
-            pieceRepeater.model = 0
-            pieceRepeater.model = boardSize * boardSize
-        }
-
-        onPositionChanged: function(mouse) {
-            // 现在与 onClicked 完全一致
-            var crossX = mouse.x - cellSize/2
-            var crossY = mouse.y - cellSize/2
-            var col = Math.round(crossX / cellSize)
-            var row = Math.round(crossY / cellSize)
-
-            if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
-                if (game.pieceAt(row, col) === 0 && !game.gameOver) {
-                    preview.x = boardX + col * cellSize - preview.width/2
-                    preview.y = boardY + row * cellSize - preview.height/2
-                    preview.color = game.currentPlayer === 0 ? "black" : "white"
-                    preview.visible = true
+        // 悬停处理器：驱动预览棋子
+        HoverHandler {
+            id: hoverHandler
+            enabled: !game.gameOver
+            // 当悬停点移动时
+            onPointChanged: {
+                if (point.position.x < 0 || point.position.y < 0) {
+                    preview.visible = false
                     return
                 }
+                var crossX = point.position.x - cellSize/2
+                var crossY = point.position.y - cellSize/2
+                var col = Math.round(crossX / cellSize)
+                var row = Math.round(crossY / cellSize)
+                if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
+                    if (game.pieceAt(row, col) === 0) {
+                        preview.x = boardX + col * cellSize - preview.width/2
+                        preview.y = boardY + row * cellSize - preview.height/2
+                        preview.color = game.currentPlayer === 0 ? "black" : "white"
+                        preview.visible = true
+                        return
+                    }
+                }
+                preview.visible = false
             }
-            preview.visible = false
+            // 离开区域时隐藏预览
+            onHoveredChanged: {
+                if (!hovered) preview.visible = false
+            }
         }
 
-        onExited: {
-            preview.visible = false
+        // 点击处理器：落子
+        TapHandler {
+            enabled: !game.gameOver
+            acceptedButtons: Qt.LeftButton
+            onTapped: {
+                // 使用 point.position 获取点击坐标
+                var crossX = point.position.x - cellSize/2
+                var crossY = point.position.y - cellSize/2
+                var col = Math.round(crossX / cellSize)
+                var row = Math.round(crossY / cellSize)
+                if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
+                    game.placePiece(row, col)
+                    pieceRepeater.model = 0
+                    pieceRepeater.model = boardSize * boardSize
+                }
+            }
         }
     }
 
@@ -152,9 +167,14 @@ Rectangle {
             text: game.winnerText + "\n点击重新开始"
             horizontalAlignment: Text.AlignHCenter
         }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: game.startGame()
+        TapHandler {
+            enabled: game.gameOver
+            onTapped: {
+                game.startGame()
+                // 强制刷新棋子显示，让棋盘变空!!!!
+                pieceRepeater.model = 0
+                pieceRepeater.model = boardSize * boardSize
+            }
         }
     }
 
