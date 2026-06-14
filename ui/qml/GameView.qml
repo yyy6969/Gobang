@@ -1,13 +1,38 @@
 import QtQuick 2.15
-
+import QtQuick.Controls 2.15
 Rectangle {
     width: 600; height: 650
     color: "#F0F0F0"
+    // 新增：接收游戏模式（local/lan/ai）
+    property string gameMode: "local"
+    // 新增：返回菜单信号
+    signal backToMenu()
     property int cellSize: 38
     property int boardSize: 15
     // 棋盘起点偏移，使其居中
     property int boardX: (width - (boardSize-1) * cellSize) / 2
     property int boardY: (height - (boardSize-1) * cellSize) / 2 + 20  // 预留顶部计时空间
+
+    // 返回按钮
+    Button {
+        text: "← 返回菜单"
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.margins: 10
+        font.pixelSize: 14
+        background: Rectangle {
+            color: "#e94560"
+            radius: 8
+        }
+        contentItem: Text {
+            text: parent.text
+            color: "white"
+            font.pixelSize: 14
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+        onClicked: backToMenu()
+    }
 
     // 计时显示
     Text {
@@ -21,6 +46,19 @@ Rectangle {
         var m = Math.floor(sec/60)
         var s = sec % 60
         return m + ":" + (s<10?"0":"") + s
+    }
+
+    // 新增模式提示
+    Text {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: 38
+        text: {
+            if (gameMode === "local") return "🏠 本地对战 · 双人轮流"
+            if (gameMode === "lan") return "🌐 局域网对战 · 等待连接"
+            return "🤖 人机对战 · 黑棋先行"
+        }
+        font.pixelSize: 14
+        color: "#555"
     }
 
     // 棋盘背景
