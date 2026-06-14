@@ -1,0 +1,50 @@
+Gomoku/
+├── core/                         # 游戏核心（与界面无关）
+│   ├── gomoku_engine.h/cpp       # 引擎：棋盘、规则、回合、胜负、计时
+│   ├── board.h/cpp               # 15x15 棋盘状态
+│   ├── player.h                  # Player 抽象接口
+│   ├── human_player.h/cpp        # 本地人类玩家
+│   ├── ai_player.h/cpp           # AI 玩家（可暂简单实现）
+│   └── timer_manager.h/cpp       # 双方计时器管理
+├── network/                      # 网络对战
+│   ├── network_player.h/cpp      # 远程玩家（封装 socket 收发）
+│   ├── game_server.h/cpp         # 局域网服务端
+│   └── game_client.h/cpp         # 局域网客户端
+├── ui/                           # QML 界面与 C++ 桥接
+│   ├── qml/
+│   │   ├── MainScreen.qml        # 主菜单（三个入口）
+│   │   ├── GameView.qml          # 通用对局界面（棋盘、计时器、状态）
+│   │   └── BoardView.qml         # 15x15 棋盘绘制
+│   ├── game_controller.h/cpp     # 对局控制器（连接引擎、玩家与UI）
+│   └── mainwindow.h/cpp          # 主窗口（装载 QML）
+├── main.cpp
+└── docs/                         # 设计文档
+    ├── state_machine.md
+    ├── uml_class_diagram.md
+    └── project_skeleton.md
+
+----------------------------------------------------------------------------------------------------------progra -release
+
+
+
+1:made
+2	创建 Board 类（头文件 + 实现）	管理 15×15 数组，提供落子、查询、胜负判定
+	--------		enum Piece { Empty, Black, White }
+
+			一个 15×15 的二维数组
+
+			bool place(row, col, piece)：在指定位置落子，返回是否合法
+
+			Piece get(row, col)：查询某位置棋子
+
+			Piece checkWin(row, col)：从最新落子位置检查是否五连
+
+			一个供 QML 调用的 Q_INVOKABLE int pieceAt(row, col) 方法（返回 0/1/2）
+
+			胜负判定逻辑：在 checkWin 里对横、竖、两个对角线四个方向计数，连续相同颜色达到 5 即胜。
+			
+3	创建 GameEngine 类（QObject，带信号/属性）	总管对局流程：回合切换、计时、胜负、超时
+4	修改 MainWindow，内嵌 QQuickWidget	用现有 Widgets 框架，把 QML 嵌进去
+5	写 GameView.qml（最简单的棋盘 + 计时显示）	画格子，画棋子，响应点击
+6	在 main.cpp 里启动 MainWindow	入口，程序跑起来
+7	连接信号、属性，测试对局	保证黑白交替、五连判胜、15 分钟包干超时判负
