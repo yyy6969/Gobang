@@ -47,12 +47,6 @@ void GameEngine::placePiece(int row, int col)
     switchTurn();
 }
 
-// 【新增】外部结束游戏
-void GameEngine::endGame(const QString &msg)
-{
-    setGameOver(msg);
-}
-
 void GameEngine::switchTurn()
 {
     m_turn = 1 - m_turn;
@@ -110,4 +104,10 @@ void GameEngine::reset()
     emit blackTimeChanged();
     emit whiteTimeChanged();
     emit gameOverChanged();
+}
+
+//endGame 方法（只定义一次）
+void GameEngine::endGame(const QString &msg)
+{
+    setGameOver(msg);
 }

@@ -6,6 +6,7 @@
 #include <QVector>
 #include <algorithm>
 #include <climits>
+#include <QTimer>  // 【新增】
 
 static const int DIRS[4][2] = {{0,1}, {1,0}, {1,1}, {1,-1}};
 
@@ -125,6 +126,7 @@ void GameController::cancelNetwork()
     if (m_client) { m_client->disconnect(); delete m_client; m_client = nullptr; }
     setNetworkStatus("");
     m_gameMode = LocalMode;
+    m_pendingMoves.clear();  // 清空待刷新列表
 }
 
 void GameController::sendChat(const QString &msg)
@@ -147,7 +149,7 @@ void GameController::giveUp()
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
         sendGiveUpToPeer();
         QString winner = m_isHost ? "白方" : "黑方";
-        m_engine.endGame(winner + "（对方认输）");  // 【修改】使用 endGame
+        m_engine.endGame(winner + "（对方认输）");
     }
 }
 
@@ -162,6 +164,22 @@ bool GameController::isGameOver() const { return m_engine.isGameOver(); }
 QString GameController::winnerText() const { return m_engine.winnerText(); }
 int GameController::blackTime() const { return m_engine.blackTime(); }
 int GameController::whiteTime() const { return m_engine.whiteTime(); }
+
+// 刷新棋盘 - 遍历所有格子发送刷新信号
+void GameController::refreshBoard()
+{
+    qDebug() << "Refresh board called";
+    // 发送全部棋盘刷新信号
+    for (int row = 0; row < Board::SIZE; ++row) {
+        for (int col = 0; col < Board::SIZE; ++col) {
+            int piece = m_engine.pieceAt(row, col);
+            if (piece != 0) {
+                emit boardChanged(row, col, piece - 1);  // piece: 1=Black, 2=White
+            }
+        }
+    }
+    emit boardRefreshNeeded();  // 额外发送刷新信号
+}
 
 void GameController::onEngineTurnChanged()
 {
@@ -181,6 +199,7 @@ void GameController::onEngineGameOverChanged()
 
 void GameController::onEngineBoardChanged(int row, int col, int player)
 {
+    qDebug() << "Board changed at" << row << col << "player" << player;
     emit boardChanged(row, col, player);
 }
 
@@ -189,33 +208,39 @@ void GameController::onEngineTimeChanged()
     emit gameStateChanged();
 }
 
-// ---- 网络槽函数 ----
+// 网络槽函数
 void GameController::onServerConnected()
 {
     setNetworkStatus("已连接，黑棋先走");
     startGame();
 }
+
 void GameController::onServerDisconnected()
 {
     setNetworkStatus("对方断开连接");
     cancelNetwork();
 }
+
 void GameController::onServerMove(int row, int col)
 {
+    qDebug() << "Server received move:" << row << col;
     applyRemoteMove(row, col);
 }
+
 void GameController::onServerGameOver(const QString &winner)
 {
     Q_UNUSED(winner);
 }
+
 void GameController::onServerChat(const QString &name, const QString &msg)
 {
     appendChat(name, msg);
 }
+
 void GameController::onServerGiveUp()
 {
     if (!m_engine.isGameOver()) {
-        m_engine.endGame("对方认输，您获胜！");  // 【修改】使用 endGame
+        m_engine.endGame("对方认输，您获胜！");
     }
 }
 
@@ -224,27 +249,33 @@ void GameController::onClientConnected()
     setNetworkStatus("已连接，您是白棋");
     startGame();
 }
+
 void GameController::onClientDisconnected()
 {
     setNetworkStatus("服务器断开连接");
     cancelNetwork();
 }
+
 void GameController::onClientMove(int row, int col)
 {
+    qDebug() << "Client received move:" << row << col;
     applyRemoteMove(row, col);
 }
+
 void GameController::onClientGameOver(const QString &winner)
 {
     Q_UNUSED(winner);
 }
+
 void GameController::onClientChat(const QString &name, const QString &msg)
 {
     appendChat(name, msg);
 }
+
 void GameController::onClientGiveUp()
 {
     if (!m_engine.isGameOver()) {
-        m_engine.endGame("对方认输，您获胜！");  // 【修改】使用 endGame
+        m_engine.endGame("对方认输，您获胜！");
     }
 }
 
@@ -272,22 +303,41 @@ void GameController::sendMoveToPeer(int row, int col)
     if (m_server) m_server->sendMove(row, col);
     else if (m_client) m_client->sendMove(row, col);
 }
+
 void GameController::sendGameOverToPeer(const QString &winner)
 {
     if (m_server) m_server->sendGameOver(winner);
     else if (m_client) m_client->sendGameOver(winner);
 }
+
+// 远程落子后立即刷新界面
 void GameController::applyRemoteMove(int row, int col)
 {
     if (m_engine.isGameOver()) return;
     if (m_processingRemote) return;
-    if (m_engine.pieceAt(row, col) != 0) return;
+    if (m_engine.pieceAt(row, col) != 0) {
+        qDebug() << "Position already occupied:" << row << col;
+        return;
+    }
+
     m_processingRemote = true;
+
+    qDebug() << "Applying remote move at" << row << col;
+
+    // 执行落子
     m_engine.placePiece(row, col);
+
+    // 落子后立即刷新整盘棋盘，确保对方能看到
+    // 使用定时器延迟1ms执行，确保 engine 状态已更新
+    QTimer::singleShot(1, this, [this]() {
+        refreshBoard();
+        qDebug() << "Board refreshed after remote move";
+    });
+
     m_processingRemote = false;
 }
 
-// ---- AI 函数（您的原有实现） ----
+// ---- AI 函数 ----
 void GameController::aiMove()
 {
     static bool aiBusy = false;

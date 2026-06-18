@@ -14,7 +14,26 @@ Rectangle {
     property int boardX: (width - (boardSize-1) * cellSize) / 2
     property int boardY: (height - (boardSize-1) * cellSize) / 2 + 20
 
-    // 返回按钮（无图形效果）
+    // ========== 网络状态栏 ==========
+    Rectangle {
+        id: networkStatusBar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 30
+        color: game.networkStatus !== "" ? "#2980b9" : "transparent"
+        visible: game.networkStatus !== ""
+
+        Text {
+            anchors.centerIn: parent
+            text: game.networkStatus
+            color: "white"
+            font.pixelSize: 13
+            font.bold: true
+        }
+    }
+
+    // 返回按钮
     Button {
         id: backBtn
         text: "← 返回菜单"
@@ -37,7 +56,9 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
-        onClicked: backToMenu()
+        onClicked: {
+            backToMenu()
+        }
     }
 
     // 计时卡片
@@ -76,7 +97,7 @@ Rectangle {
             anchors.centerIn: parent
             text: {
                 if (gameMode === "local") return "🏠 本地对战 · 双人轮流"
-                if (gameMode === "lan") return "🌐 局域网对战 · 等待连接"
+                if (gameMode === "lan") return "🌐 局域网对战"
                 return "🤖 人机对战 · 黑棋先行"
             }
             font.pixelSize: 12
@@ -85,7 +106,7 @@ Rectangle {
         }
     }
 
-    // 棋盘底板（模拟阴影：两个矩形错位）
+    // 棋盘底板已删除重复冗余的一层
     Rectangle {
         x: boardX - 2; y: boardY - 2
         width: (boardSize-1) * cellSize + 4
@@ -98,16 +119,6 @@ Rectangle {
         width: (boardSize-1) * cellSize + 2
         height: (boardSize-1) * cellSize + 2
         radius: 4
-        color: "#d4a373"
-        border.color: "#7f5539"
-        border.width: 1
-    }
-
-    // 棋盘内底色
-    Rectangle {
-        x: boardX - 1; y: boardY - 1
-        width: (boardSize-1) * cellSize + 2
-        height: (boardSize-1) * cellSize + 2
         color: "#e9c5a3"
         border.color: "#8b5a2b"
         border.width: 1
@@ -147,11 +158,11 @@ Rectangle {
             width: 6; height: 6
             radius: 3
             color: "#8b5a2b"
-            visible: boardSize === 15 && (modelData.x === 3 || modelData.x === 7 || modelData.x === 11)
+            visible: boardSize === 15
         }
     }
 
-    // 预览棋子（无光晕）
+    // 预览棋子（显示在交点上）
     Rectangle {
         id: preview
         width: cellSize * 0.8
@@ -163,43 +174,134 @@ Rectangle {
         border.color: "gold"
     }
 
-    // 棋子层（带缩放动画）
-    Item {
-        id: piecesLayer
-        anchors.fill: parent
-        Repeater {
-            id: pieceRepeater
-            model: boardSize * boardSize
-            Rectangle {
-                property int row: index / boardSize
-                property int col: index % boardSize
-                x: boardX + col * cellSize - width/2
-                y: boardY + row * cellSize - height/2
-                width: cellSize * 0.8
-                height: width
-                radius: width/2
-                color: {
-                    var p = game.pieceAt(row, col)
-                    if (p === 1) return "#2c2c2c"
-                    if (p === 2) return "#f8f9fa"
-                    return "transparent"
+    //  使用 Canvas 绘制棋子
+    Canvas {
+        id: boardCanvas
+        x: boardX - cellSize/2
+        y: boardY - cellSize/2
+        width: (boardSize-1) * cellSize + cellSize
+        height: (boardSize-1) * cellSize + cellSize
+        z: 5
+
+        property int lastRow: -1
+        property int lastCol: -1
+
+        onPaint: {
+            var ctx = getContext("2d")
+            ctx.clearRect(0, 0, width, height)
+
+            // 绘制所有棋子 - 修正：圆心对齐网格交点
+            for (var row = 0; row < boardSize; row++) {
+                for (var col = 0; col < boardSize; col++) {
+                    var piece = game.pieceAt(row, col)
+                    if (piece !== 0) {
+                        // 加上半个格子偏移，让圆心落在交点上
+                        var x = cellSize / 2 + col * cellSize
+                        var y = cellSize / 2 + row * cellSize
+                        var radius = cellSize * 0.38
+
+                        // 棋子阴影
+                        ctx.shadowColor = "rgba(0,0,0,0.3)"
+                        ctx.shadowBlur = 4
+                        ctx.shadowOffsetX = 1
+                        ctx.shadowOffsetY = 1
+
+                        // 绘制棋子
+                        ctx.beginPath()
+                        ctx.arc(x, y, radius, 0, Math.PI * 2)
+                        ctx.closePath()
+
+                        if (piece === 1) { // 黑棋
+                            var gradient = ctx.createRadialGradient(
+                                x - radius*0.3, y - radius*0.3, radius*0.1,
+                                x, y, radius
+                            )
+                            gradient.addColorStop(0, "#555555")
+                            gradient.addColorStop(0.7, "#222222")
+                            gradient.addColorStop(1, "#111111")
+                            ctx.fillStyle = gradient
+                        } else { // 白棋
+                            var gradient = ctx.createRadialGradient(
+                                x - radius*0.3, y - radius*0.3, radius*0.1,
+                                x, y, radius
+                            )
+                            gradient.addColorStop(0, "#ffffff")
+                            gradient.addColorStop(0.5, "#f0f0f0")
+                            gradient.addColorStop(1, "#d0d0d0")
+                            ctx.fillStyle = gradient
+                        }
+
+                        ctx.shadowColor = "rgba(0,0,0,0.2)"
+                        ctx.shadowBlur = 3
+                        ctx.fill()
+
+                        // 取消阴影（用于高光）
+                        ctx.shadowColor = "transparent"
+                        ctx.shadowBlur = 0
+
+                        // 高光效果
+                        if (piece === 1) {
+                            ctx.beginPath()
+                            ctx.arc(x - radius*0.25, y - radius*0.25, radius*0.15, 0, Math.PI * 2)
+                            ctx.closePath()
+                            ctx.fillStyle = "rgba(255,255,255,0.15)"
+                            ctx.fill()
+                        } else {
+                            ctx.beginPath()
+                            ctx.arc(x - radius*0.25, y - radius*0.25, radius*0.2, 0, Math.PI * 2)
+                            ctx.closePath()
+                            ctx.fillStyle = "rgba(255,255,255,0.6)"
+                            ctx.fill()
+                        }
+                    }
                 }
-                border.width: color === "#f8f9fa" ? 1 : 0
-                border.color: "#aaa"
-                visible: color !== "transparent"
-                scale: visible ? 1 : 0
-                Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutElastic } }
+            }
+
+            // 最后落子标记 - 修正：对齐交点
+            if (lastRow >= 0 && lastCol >= 0 && game.pieceAt(lastRow, lastCol) !== 0) {
+                var lx = cellSize / 2 + lastCol * cellSize
+                var ly = cellSize / 2 + lastRow * cellSize
+                ctx.beginPath()
+                ctx.arc(lx, ly, 4, 0, Math.PI * 2)
+                ctx.closePath()
+                ctx.fillStyle = "#e94560"
+                ctx.fill()
+            }
+        }
+
+        //  监听网络刷新信号
+        Connections {
+            target: game
+            onBoardChanged: {
+                boardCanvas.requestPaint()
+            }
+            onBoardRefreshNeeded: {
+                boardCanvas.requestPaint()
+            }
+            onGameStateChanged: {
+                boardCanvas.requestPaint()
+            }
+        }
+
+        // 定时器作为后备刷新机制
+        Timer {
+            interval: 500
+            running: gameMode === "lan"
+            repeat: true
+            onTriggered: {
+                boardCanvas.requestPaint()
             }
         }
     }
 
-    // 鼠标交互
+    // 鼠标交互 - 修正点击坐标换算，对准网格交点
     Item {
         id: inputArea
         x: boardX - cellSize/2
         y: boardY - cellSize/2
         width: (boardSize-1) * cellSize + cellSize
         height: (boardSize-1) * cellSize + cellSize
+        z: 6
 
         HoverHandler {
             id: hoverHandler
@@ -209,12 +311,15 @@ Rectangle {
                     preview.visible = false
                     return
                 }
-                var crossX = point.position.x - cellSize/2
-                var crossY = point.position.y - cellSize/2
-                var col = Math.round(crossX / cellSize)
-                var row = Math.round(crossY / cellSize)
+                // 修正先抵消边距偏移，再计算最近交点
+                var localX = point.position.x - cellSize / 2
+                var localY = point.position.y - cellSize / 2
+                var col = Math.round(localX / cellSize)
+                var row = Math.round(localY / cellSize)
+
                 if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
                     if (game.pieceAt(row, col) === 0) {
+                        // 预览棋子圆心对齐交点
                         preview.x = boardX + col * cellSize - preview.width/2
                         preview.y = boardY + row * cellSize - preview.height/2
                         preview.color = game.currentPlayer === 0 ? "#2c2c2c" : "#f8f9fa"
@@ -233,19 +338,25 @@ Rectangle {
             enabled: !game.gameOver
             acceptedButtons: Qt.LeftButton
             onTapped: {
-                var crossX = point.position.x - cellSize/2
-                var crossY = point.position.y - cellSize/2
-                var col = Math.round(crossX / cellSize)
-                var row = Math.round(crossY / cellSize)
+                // 修正点击坐标换算，和悬停逻辑保持一致
+                var localX = point.position.x - cellSize / 2
+                var localY = point.position.y - cellSize / 2
+                var col = Math.round(localX / cellSize)
+                var row = Math.round(localY / cellSize)
+
                 if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
-                    game.placePiece(row, col)
-                    pieceRepeater.model = 0
-                    pieceRepeater.model = boardSize * boardSize
+                    if (game.pieceAt(row, col) === 0) {
+                        boardCanvas.lastRow = row
+                        boardCanvas.lastCol = col
+                        game.placePiece(row, col)
+                        boardCanvas.requestPaint()
+                    }
                 }
             }
         }
     }
 
+    // 游戏结束遮罩
     Rectangle {
         visible: game.gameOver
         anchors.fill: parent
@@ -286,9 +397,10 @@ Rectangle {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
+                        boardCanvas.lastRow = -1
+                        boardCanvas.lastCol = -1
                         game.startGame()
-                        pieceRepeater.model = 0
-                        pieceRepeater.model = boardSize * boardSize
+                        boardCanvas.requestPaint()
                     }
                 }
                 Button {
@@ -313,6 +425,84 @@ Rectangle {
         }
     }
 
+    //  聊天区域
+    Rectangle {
+        id: chatPanel
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 10
+        height: 120
+        color: "#34495e"
+        radius: 10
+        visible: gameMode === "lan"
+        z: 8
+
+        Column {
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 4
+
+            ScrollView {
+                width: parent.width
+                height: 65
+                clip: true
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AlwaysOff
+                }
+
+                TextArea {
+                    id: chatDisplay
+                    text: game.chatHistory
+                    color: "#ecf0f1"
+                    font.pixelSize: 12
+                    readOnly: true
+                    wrapMode: Text.Wrap
+                    background: Rectangle {
+                        color: "transparent"
+                    }
+                }
+            }
+
+            Row {
+                width: parent.width
+                spacing: 6
+
+                TextField {
+                    id: chatInput
+                    width: parent.width - 70
+                    height: 30
+                    placeholderText: "输入聊天消息..."
+                    color: "white"
+                    font.pixelSize: 12
+                    background: Rectangle {
+                        color: "#2c3e50"
+                        radius: 5
+                    }
+                    onAccepted: sendChat()
+                }
+
+                Button {
+                    text: "发送"
+                    width: 60
+                    height: 30
+                    font.pixelSize: 12
+                    background: Rectangle {
+                        color: parent.hovered ? "#2980b9" : "#3498db"
+                        radius: 5
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: sendChat()
+                }
+            }
+        }
+    }
+
     function formatTime(sec) {
         if (sec === undefined) return "0:00"
         var m = Math.floor(sec/60)
@@ -320,7 +510,14 @@ Rectangle {
         return m + ":" + (s<10?"0":"") + s
     }
 
-    // 关键：修复残留棋盘 bug
+    function sendChat() {
+        if (chatInput.text.trim() !== "") {
+            game.sendChat(chatInput.text)
+            chatInput.text = ""
+        }
+    }
+
+    // 初始化
     Component.onCompleted: {
         if (gameMode === "local")
             game.setGameMode(0)
@@ -330,7 +527,20 @@ Rectangle {
             game.setGameMode(1)
 
         game.startGame()
-        pieceRepeater.model = 0
-        pieceRepeater.model = boardSize * boardSize
+        boardCanvas.requestPaint()
+
+        if (gameMode === "lan") {
+            refreshTimer.start()
+        }
+    }
+
+    Timer {
+        id: refreshTimer
+        interval: 300
+        repeat: true
+        running: gameMode === "lan"
+        onTriggered: {
+            boardCanvas.requestPaint()
+        }
     }
 }

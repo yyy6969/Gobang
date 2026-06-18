@@ -62,11 +62,15 @@ public:
     QString networkStatus() const { return m_networkStatus; }
     QString chatHistory() const { return m_chatHistory; }
 
+    // 【新增】强制刷新棋盘（供 QML 调用）
+    Q_INVOKABLE void refreshBoard();
+
 signals:
     void gameStateChanged();
     void boardChanged(int row, int col, int player);
     void networkStatusChanged();
     void chatHistoryChanged();
+    void boardRefreshNeeded();  // 【新增】强制刷新信号
 
 private slots:
     void onEngineTurnChanged();
@@ -103,6 +107,9 @@ private:
     bool m_processingRemote;
     QString m_chatHistory;
 
+    // 用于批量刷新
+    QList<QPair<int, QPair<int, int>>> m_pendingMoves;
+
     void setNetworkStatus(const QString &status);
     void sendMoveToPeer(int row, int col);
     void sendGameOverToPeer(const QString &winner);
@@ -111,7 +118,7 @@ private:
     void appendChat(const QString &name, const QString &msg);
     void aiMove();
 
-    // AI 决策函数（保持不变）
+    // AI 决策函数
     QPair<int, int> getAIMoveEasy();
     QPair<int, int> getAIMoveMedium();
     QPair<int, int> getAIMoveHard();
