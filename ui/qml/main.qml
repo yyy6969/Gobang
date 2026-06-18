@@ -7,8 +7,8 @@ ApplicationWindow {
     width: 850
     height: 650
     title: "五子棋"
-    minimumWidth: 850
-       maximumWidth: 850
+    minimumWidth: 1000
+       maximumWidth: 1000
        minimumHeight: 650
        maximumHeight: 650
 
