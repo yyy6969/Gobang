@@ -17,9 +17,9 @@ qt_add_executable(Gonbal_My_Game
     core/timer_manager.cpp
     ui/game_controller.cpp
     # 如果你还有 network 模块且需要编译，取消注释下面三行
-    # nerwork/game_client.cpp
-    # nerwork/game_server.cpp
-    # nerwork/network_player.cpp
+    nerwork/game_client.cpp
+    nerwork/game_server.cpp
+    nerwork/network_player.cpp
 )
 
 # 将 QML 文件编译为资源（qrc）
@@ -42,6 +42,7 @@ target_link_libraries(Gonbal_My_Game
         Qt::Qml
         Qt::Quick
         Qt::QuickControls2
+        Qt::Network
 )
 
 # 可选：将头文件添加到 IDE 中（方便查看）
@@ -53,9 +54,9 @@ target_sources(Gonbal_My_Game PRIVATE
     core/player.h
     core/timer_manager.h
     ui/game_controller.h
-    # nerwork/game_client.h
-    # nerwork/game_server.h
-    # nerwork/network_player.h
+    nerwork/game_client.h
+    nerwork/game_server.h
+    nerwork/network_player.h
 )
 
 # 部署设置

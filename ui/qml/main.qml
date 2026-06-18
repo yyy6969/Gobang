@@ -8,34 +8,37 @@ ApplicationWindow {
     height: 650
     title: "五子棋"
 
-    // 页面栈
     StackView {
         id: stackView
         anchors.fill: parent
         initialItem: mainMenuPage
     }
 
-    // 主菜单组件
     Component {
         id: mainMenuPage
         MainMenu {
             onLocalGame: {
+                game.setGameMode(0)
                 stackView.push(gamePage, { gameMode: "local" })
             }
-            onLanGame: {
-                stackView.push(gamePage, { gameMode: "lan" })
-            }
-            onAiGame: {
+            onAiGame: function(difficulty) {
+                game.setGameMode(1)
+                game.setAIDifficulty(difficulty)
                 stackView.push(gamePage, { gameMode: "ai" })
+            }
+            onLanGameStart: {
+                stackView.push(gamePage, { gameMode: "network" })
             }
         }
     }
 
-    // 游戏界面组件
     Component {
         id: gamePage
         GameView {
-            onBackToMenu: stackView.pop()
+            onBackToMenu: {
+                game.cancelNetwork()
+                stackView.pop()
+            }
         }
     }
 }

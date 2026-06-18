@@ -47,6 +47,12 @@ void GameEngine::placePiece(int row, int col)
     switchTurn();
 }
 
+// 【新增】外部结束游戏
+void GameEngine::endGame(const QString &msg)
+{
+    setGameOver(msg);
+}
+
 void GameEngine::switchTurn()
 {
     m_turn = 1 - m_turn;
@@ -68,10 +74,12 @@ void GameEngine::onTimeout()
         setGameOver(m_turn == 0 ? "黑方超时，白方胜！" : "白方超时，黑方胜！");
     }
 }
+
 int GameEngine::pieceAt(int row, int col) const
 {
     return m_board.pieceAt(row, col);
 }
+
 void GameEngine::setGameOver(const QString &msg)
 {
     m_gameOver = true;
@@ -89,9 +97,6 @@ void GameEngine::reset()
     m_winnerText.clear();
     m_timer.stop();
 
-
-
-    // 输出前几个格子的值，验证是否全为 Empty (0)
     qDebug() << "=== After reset ===";
     for (int r = 0; r < 3; ++r) {
         QString line;
@@ -100,7 +105,6 @@ void GameEngine::reset()
         }
         qDebug() << line;
     }
-
 
     emit turnChanged();
     emit blackTimeChanged();
