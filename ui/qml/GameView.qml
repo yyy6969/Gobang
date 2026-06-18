@@ -488,7 +488,7 @@ Rectangle {
                     text: game.chatHistory   // 绑定 C++ 的 chatHistory 属性
                     onTextChanged: {
                         // 滚动到底部显示最新消息
-                        chatScrollView.contentY = chatDisplay.height - chatScrollView.height
+                        chatScrollView.contentItem.contentY = chatDisplay.height - chatScrollView.height
                     }
                 }
             }
