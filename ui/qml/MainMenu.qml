@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.15
 
 Rectangle {
     id: menuRoot
-    width: 800
+    width: 850
     height: 650
     color: "#1a1a2e"
 

@@ -425,45 +425,75 @@ Rectangle {
         }
     }
 
-    //  聊天区域
+
+
+    function formatTime(sec) {
+        if (sec === undefined) return "0:00"
+        var m = Math.floor(sec/60)
+        var s = sec % 60
+        return m + ":" + (s<10?"0":"") + s
+    }
+
+
+
+
+    // 右侧聊天面板
     Rectangle {
         id: chatPanel
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 10
-        height: 120
+        anchors {
+            left: parent.left
+            leftMargin: 620   // 棋盘左边界 + 棋盘宽度 + 间距
+            top: parent.top
+            topMargin: 20
+            bottom: parent.bottom
+            bottomMargin: 20
+        }
+        width: 220
         color: "#34495e"
-        radius: 10
-        visible: gameMode === "lan"
-        z: 8
+        radius: 8
+        border.color: "#2c3e50"
+        border.width: 1
 
         Column {
             anchors.fill: parent
-            anchors.margins: 8
-            spacing: 4
+            anchors.margins: 10
+            spacing: 8
 
+            // 标题
+            Text {
+                text: "💬 聊天"
+                font.bold: true
+                color: "white"
+                font.pixelSize: 16
+            }
+
+            // 历史消息显示区域（只读）
             ScrollView {
+                id: chatScrollView
                 width: parent.width
-                height: 65
+                height: parent.height - 80   // 留出输入框的高度
                 clip: true
-                ScrollBar.vertical: ScrollBar {
-                    policy: ScrollBar.AlwaysOff
-                }
 
                 TextArea {
                     id: chatDisplay
-                    text: game.chatHistory
-                    color: "#ecf0f1"
-                    font.pixelSize: 12
+                    width: chatScrollView.width - 10
                     readOnly: true
-                    wrapMode: Text.Wrap
+                    wrapMode: TextArea.Wrap
+                    color: "#ecf0f1"
+                    font.pixelSize: 13
                     background: Rectangle {
-                        color: "transparent"
+                        color: "#2c3e50"
+                        radius: 4
+                    }
+                    text: game.chatHistory   // 绑定 C++ 的 chatHistory 属性
+                    onTextChanged: {
+                        // 滚动到底部显示最新消息
+                        chatScrollView.contentY = chatDisplay.height - chatScrollView.height
                     }
                 }
             }
 
+            // 输入框 + 发送按钮行
             Row {
                 width: parent.width
                 spacing: 6
@@ -471,28 +501,31 @@ Rectangle {
                 TextField {
                     id: chatInput
                     width: parent.width - 70
-                    height: 30
-                    placeholderText: "输入聊天消息..."
+                    height: 32
                     color: "white"
-                    font.pixelSize: 12
+                    font.pixelSize: 13
+                    placeholderText: "输入消息..."
+                    placeholderTextColor: "#888"
                     background: Rectangle {
                         color: "#2c3e50"
-                        radius: 5
+                        radius: 4
                     }
-                    onAccepted: sendChat()
+                    onAccepted: sendChat()   // 按回车发送
                 }
 
                 Button {
+                    id: sendBtn
                     text: "发送"
                     width: 60
-                    height: 30
-                    font.pixelSize: 12
+                    height: 32
+                    font.pixelSize: 13
+                    font.bold: true
                     background: Rectangle {
-                        color: parent.hovered ? "#2980b9" : "#3498db"
-                        radius: 5
+                        color: sendBtn.hovered ? "#27ae60" : "#2ecc71"
+                        radius: 4
                     }
                     contentItem: Text {
-                        text: parent.text
+                        text: sendBtn.text
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -503,17 +536,14 @@ Rectangle {
         }
     }
 
-    function formatTime(sec) {
-        if (sec === undefined) return "0:00"
-        var m = Math.floor(sec/60)
-        var s = sec % 60
-        return m + ":" + (s<10?"0":"") + s
-    }
 
+    //聊天框的测试操作
     function sendChat() {
-        if (chatInput.text.trim() !== "") {
-            game.sendChat(chatInput.text)
-            chatInput.text = ""
+        var msg = chatInput.text.trim()
+        if (msg !== "") {
+            game.sendChat(msg)   // 调用 C++ 的 sendChat
+            chatInput.text = ""  // 清空输入框
+            chatInput.focus = true
         }
     }
 

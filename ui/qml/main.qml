@@ -4,9 +4,13 @@ import QtQuick.Controls 2.15
 ApplicationWindow {
     id: root
     visible: true
-    width: 800
+    width: 850
     height: 650
     title: "五子棋"
+    minimumWidth: 850
+       maximumWidth: 850
+       minimumHeight: 650
+       maximumHeight: 650
 
     StackView {
         id: stackView
