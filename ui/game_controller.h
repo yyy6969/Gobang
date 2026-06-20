@@ -62,7 +62,7 @@ public:
     QString networkStatus() const { return m_networkStatus; }
     QString chatHistory() const { return m_chatHistory; }
 
-    // 【新增】强制刷新棋盘（供 QML 调用）
+    //强制刷新棋盘
     Q_INVOKABLE void refreshBoard();
 
 signals:
@@ -70,7 +70,7 @@ signals:
     void boardChanged(int row, int col, int player);
     void networkStatusChanged();
     void chatHistoryChanged();
-    void boardRefreshNeeded();  // 【新增】强制刷新信号
+    void boardRefreshNeeded();  //强制刷新信号
 
 private slots:
     void onEngineTurnChanged();

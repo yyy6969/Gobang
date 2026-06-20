@@ -20,10 +20,6 @@
 //email: 2052448030@qq.com
 //models:   游戏的核心--检测状态,记录玩家剩余时间,计算游戏是否结束
 //玩家循环落子操作逻辑
-// QML 绑定 game.currentPlayer 显示当前回合
-//  当 C++ 里回合切换时，调用 switchTurn() 改变 m_turn，然后发射 turnChanged() 信号
-//     QML 收到 turnChanged 信号，自动重新读取 currentPlayer() 获取新值，更新 UI
-//create time : 2026-06-10 11:45:38
 
 #pragma once
 
@@ -60,7 +56,7 @@ public:
     Q_INVOKABLE void startGame();
     Q_INVOKABLE void placePiece(int row, int col);
 
-    // 【新增】外部结束游戏接口（供 GameController 调用）
+    //外部结束游戏接口（供 GameController 调用）
     Q_INVOKABLE void endGame(const QString &msg);
 
 signals:
@@ -82,6 +78,6 @@ private:
     QString m_winnerText;
 
     void switchTurn();
-    void setGameOver(const QString &msg);  // 保持 private
+    void setGameOver(const QString &msg);
     void reset();
 };

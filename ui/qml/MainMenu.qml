@@ -4,15 +4,15 @@ import QtQuick.Layouts 1.15
 
 Rectangle {
     id: menuRoot
-    width: 850
-    height: 650
+    width: 1000
+    height: 700
     color: "#1a1a2e"
 
     signal localGame()
     signal aiGame(int difficulty)   // 难度: 0简单,1一般,2困难
     signal lanGameStart()
 
-    // 局域网连接对话框（省略，同上）
+    // 局域网连接对话框
     Dialog {
         id: lanDialog
         modal: true
@@ -136,14 +136,14 @@ Rectangle {
             onClicked: localGame()
         }
 
-        // 人机对战按钮（上方）
+        // 人机对战按钮
         GameButton {
             id: aiButton
             text: "🤖 人机对战"
             onClicked: aiGame(aiCombo.currentIndex)
         }
 
-        // 难度选择区域（紧跟在人机对战按钮下方）
+        // 难度选择区域
         RowLayout {
             spacing: 10
             Layout.alignment: Qt.AlignHCenter

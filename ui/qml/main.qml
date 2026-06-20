@@ -4,13 +4,13 @@ import QtQuick.Controls 2.15
 ApplicationWindow {
     id: root
     visible: true
-    width: 850
-    height: 650
+    width: 1000
+    height: 700
     title: "五子棋"
     minimumWidth: 1000
        maximumWidth: 1000
-       minimumHeight: 650
-       maximumHeight: 650
+       minimumHeight: 700
+       maximumHeight: 700
 
     StackView {
         id: stackView
@@ -31,7 +31,7 @@ ApplicationWindow {
                 stackView.push(gamePage, { gameMode: "ai" })
             }
             onLanGameStart: {
-                stackView.push(gamePage, { gameMode: "network" })
+                stackView.push(gamePage, { gameMode: "lan" })
             }
         }
     }
