@@ -143,7 +143,7 @@ void GameController::sendChat(const QString &msg)
     appendChat("我", msg);
 }
 
-// ========== giveUp 函数 ==========
+//giveUp 函数
 void GameController::giveUp()
 {
     if (m_engine.isGameOver()) return;

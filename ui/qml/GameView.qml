@@ -225,44 +225,6 @@ Rectangle {
                 border.width: 1
             }
 
-            // 网格线
-            Repeater {
-                model: boardSize
-                Rectangle {
-                    x: boardContainer.boardX
-                    y: boardContainer.boardY + index * cellSize
-                    width: boardContainer.boardPixels
-                    height: 1
-                    color: "#4a2e1e"
-                }
-            }
-            Repeater {
-                model: boardSize
-                Rectangle {
-                    x: boardContainer.boardX + index * cellSize
-                    y: boardContainer.boardY
-                    width: 1
-                    height: boardContainer.boardPixels
-                    color: "#4a2e1e"
-                }
-            }
-
-            // 星位
-            Repeater {
-                model: [
-                    {x:3, y:3}, {x:7, y:7}, {x:11, y:11},
-                    {x:3, y:11}, {x:11, y:3}
-                ]
-                Rectangle {
-                    x: boardContainer.boardX + modelData.x * cellSize - 3
-                    y: boardContainer.boardY + modelData.y * cellSize - 3
-                    width: 6; height: 6
-                    radius: 3
-                    color: "#8b5a2b"
-                    visible: boardSize === 15
-                }
-            }
-
             // 预览棋子
             Rectangle {
                 id: preview
@@ -275,7 +237,7 @@ Rectangle {
                 border.color: "gold"
             }
 
-            // Canvas 绘制棋子
+            // Canvas网格线、星位、棋子
             Canvas {
                 id: boardCanvas
                 x: boardContainer.boardX - cellSize/2
@@ -291,12 +253,51 @@ Rectangle {
                     var ctx = getContext("2d")
                     ctx.clearRect(0, 0, width, height)
 
+                    //绘制网格线,偏移 cellSize/2以便对其棋子中心
+                    ctx.strokeStyle = "#4a2e1e"
+                    ctx.lineWidth = 1
+
+                    // 横线
                     for (var row = 0; row < boardSize; row++) {
-                        for (var col = 0; col < boardSize; col++) {
-                            var piece = game.pieceAt(row, col)
+                        var y = cellSize / 2 + row * cellSize
+                        ctx.beginPath()
+                        ctx.moveTo(cellSize / 2, y)
+                        ctx.lineTo(boardContainer.boardPixels + cellSize / 2, y)
+                        ctx.stroke()
+                    }
+
+                    // 竖线
+                    for (var col = 0; col < boardSize; col++) {
+                        var x = cellSize / 2 + col * cellSize
+                        ctx.beginPath()
+                        ctx.moveTo(x, cellSize / 2)
+                        ctx.lineTo(x, boardContainer.boardPixels + cellSize / 2)
+                        ctx.stroke()
+                    }
+
+                    // 绘制星位
+                    if (boardSize === 15) {
+                        var starPoints = [
+                            {x:3, y:3}, {x:7, y:7}, {x:11, y:11},
+                            {x:3, y:11}, {x:11, y:3}
+                        ]
+                        ctx.fillStyle = "#8b5a2b"
+                        for (var i = 0; i < starPoints.length; i++) {
+                            var sx = cellSize / 2 + starPoints[i].x * cellSize
+                            var sy = cellSize / 2 + starPoints[i].y * cellSize
+                            ctx.beginPath()
+                            ctx.arc(sx, sy, 3, 0, Math.PI * 2)
+                            ctx.fill()
+                        }
+                    }
+
+                    //绘制棋子
+                    for (var row2 = 0; row2 < boardSize; row2++) {
+                        for (var col2 = 0; col2 < boardSize; col2++) {
+                            var piece = game.pieceAt(row2, col2)
                             if (piece !== 0) {
-                                var x = cellSize / 2 + col * cellSize
-                                var y = cellSize / 2 + row * cellSize
+                                var px = cellSize / 2 + col2 * cellSize
+                                var py = cellSize / 2 + row2 * cellSize
                                 var radius = cellSize * 0.38
 
                                 ctx.shadowColor = "rgba(0,0,0,0.3)"
@@ -305,13 +306,13 @@ Rectangle {
                                 ctx.shadowOffsetY = 1
 
                                 ctx.beginPath()
-                                ctx.arc(x, y, radius, 0, Math.PI * 2)
+                                ctx.arc(px, py, radius, 0, Math.PI * 2)
                                 ctx.closePath()
 
                                 if (piece === 1) {
                                     var gradient = ctx.createRadialGradient(
-                                        x - radius*0.3, y - radius*0.3, radius*0.1,
-                                        x, y, radius
+                                        px - radius*0.3, py - radius*0.3, radius*0.1,
+                                        px, py, radius
                                     )
                                     gradient.addColorStop(0, "#555555")
                                     gradient.addColorStop(0.7, "#222222")
@@ -319,8 +320,8 @@ Rectangle {
                                     ctx.fillStyle = gradient
                                 } else {
                                     var gradient = ctx.createRadialGradient(
-                                        x - radius*0.3, y - radius*0.3, radius*0.1,
-                                        x, y, radius
+                                        px - radius*0.3, py - radius*0.3, radius*0.1,
+                                        px, py, radius
                                     )
                                     gradient.addColorStop(0, "#ffffff")
                                     gradient.addColorStop(0.5, "#f0f0f0")
@@ -335,15 +336,16 @@ Rectangle {
                                 ctx.shadowColor = "transparent"
                                 ctx.shadowBlur = 0
 
+                                // 高光
                                 if (piece === 1) {
                                     ctx.beginPath()
-                                    ctx.arc(x - radius*0.25, y - radius*0.25, radius*0.15, 0, Math.PI * 2)
+                                    ctx.arc(px - radius*0.25, py - radius*0.25, radius*0.15, 0, Math.PI * 2)
                                     ctx.closePath()
                                     ctx.fillStyle = "rgba(255,255,255,0.15)"
                                     ctx.fill()
                                 } else {
                                     ctx.beginPath()
-                                    ctx.arc(x - radius*0.25, y - radius*0.25, radius*0.2, 0, Math.PI * 2)
+                                    ctx.arc(px - radius*0.25, py - radius*0.25, radius*0.2, 0, Math.PI * 2)
                                     ctx.closePath()
                                     ctx.fillStyle = "rgba(255,255,255,0.6)"
                                     ctx.fill()
@@ -352,6 +354,7 @@ Rectangle {
                         }
                     }
 
+                    // 最后落子标记
                     if (lastRow >= 0 && lastCol >= 0 && game.pieceAt(lastRow, lastCol) !== 0) {
                         var lx = cellSize / 2 + lastCol * cellSize
                         var ly = cellSize / 2 + lastRow * cellSize
