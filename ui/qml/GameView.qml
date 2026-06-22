@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 
 Rectangle {
     id: root
-    color: "#2c3e50"
+    //color: "#2c3e50"
 
     property string gameMode: "local"
     signal backToMenu()
@@ -16,6 +16,13 @@ Rectangle {
     property int topBarHeight: topBarBaseHeight + topBarExtraHeight
     property int bottomBarHeight: 32
 
+    //背景
+    Image {
+        id: background
+        source: "qrc:/image/background2.jpg"
+        fillMode: Image.PreserveAspectCrop
+        opacity: 0.7
+    }
     //顶部栏
     Rectangle {
         id: topBar
@@ -33,7 +40,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
             height: 30
-            color: game.networkStatus !== "" ? "#2980b9" : "transparent"
+            color: game.networkStatus !== "" ? "#778899" : "transparent"
             visible: game.networkStatus !== ""
             Text {
                 anchors.centerIn: parent
@@ -63,7 +70,7 @@ Rectangle {
                 implicitWidth: 110
                 implicitHeight: 36
                 background: Rectangle {
-                    color: backBtn.hovered ? "#c0392b" : "#e94560"
+                    color: backBtn.hovered ? "#696969"  : "#a9a9a9"
                     radius: 20
                 }
                 contentItem: Text {
@@ -89,7 +96,7 @@ Rectangle {
                 background: Rectangle {
                     color: {
                         if (!giveUpBtn.enabled) return "#666666"
-                        return giveUpBtn.hovered ? "#c0392b" : "#e67e22"
+                        return giveUpBtn.hovered ? "#696969" : "#a9a9a9"
                     }
                     radius: 20
                 }
@@ -119,7 +126,7 @@ Rectangle {
                 height: 30
                 width: 280
                 radius: 15
-                color: "#34495e"
+                color: "#a9a9a9"
                 Text {
                     anchors.centerIn: parent
                     id: timeDisplay
@@ -368,9 +375,9 @@ Rectangle {
 
                 Connections {
                     target: game
-                    onBoardChanged: boardCanvas.requestPaint()
-                    onBoardRefreshNeeded: boardCanvas.requestPaint()
-                    onGameStateChanged: boardCanvas.requestPaint()
+                    function onBoardChanged(){boardCanvas.requestPaint()}
+                    function onBoardRefreshNeeded() {boardCanvas.requestPaint()}
+                    function onGameStateChanged() {boardCanvas.requestPaint()}
                 }
 
                 Timer {
@@ -448,9 +455,9 @@ Rectangle {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             width: 220
-            color: "#34495e"
+            color: "white"
             radius: 8
-            border.color: "#2c3e50"
+            border.color: "black"
             border.width: 1
             visible: gameMode === "lan"
             z: 25
@@ -463,7 +470,7 @@ Rectangle {
                 Text {
                     text: "💬 聊天"
                     font.bold: true
-                    color: "white"
+                    color: "#000000"
                     font.pixelSize: 16
                 }
 
@@ -480,7 +487,7 @@ Rectangle {
                         color: "#ecf0f1"
                         font.pixelSize: 13
                         background: Rectangle {
-                            color: "#2c3e50"
+                            color: "gray"
                             radius: 4
                         }
                         text: game.chatHistory
@@ -500,9 +507,9 @@ Rectangle {
                         color: "white"
                         font.pixelSize: 13
                         placeholderText: "输入消息..."
-                        placeholderTextColor: "#888"
+                        placeholderTextColor: "black"
                         background: Rectangle {
-                            color: "#2c3e50"
+                            color: "gray"
                             radius: 4
                         }
                         onAccepted: sendChat()
@@ -539,7 +546,7 @@ Rectangle {
         z: 100
         visible: false
 
-        MouseArea {
+        MouseArea{
             anchors.fill: parent
             onClicked: confirmDialog.visible = false
         }
@@ -551,7 +558,7 @@ Rectangle {
             radius: 20
             color: "#f0f0f0"
             border.width: 2
-            border.color: "#e94560"
+            border.color: "black"
 
             Column {
                 spacing: 16
@@ -578,7 +585,7 @@ Rectangle {
                         implicitWidth: 100
                         implicitHeight: 36
                         background: Rectangle {
-                            color: parent.hovered ? "#c0392b" : "#e94560"
+                            color: parent.hovered ? "#7f8c8d" : "#95a5a6"
                             radius: 10
                         }
                         contentItem: Text {
@@ -629,7 +636,7 @@ Rectangle {
             radius: 20
             color: "#f0f0f0"
             border.width: 2
-            border.color: "#e94560"
+            border.color: "black"
             Column {
                 spacing: 16
                 anchors.centerIn: parent
@@ -649,7 +656,7 @@ Rectangle {
                         implicitWidth: 120
                         implicitHeight: 40
                         background: Rectangle {
-                            color: parent.hovered ? "#c0392b" : "#e94560"
+                            color: parent.hovered ?  "#7f8c8d" : "#95a5a6"
                             radius: 20
                         }
                         contentItem: Text {
@@ -687,7 +694,7 @@ Rectangle {
         }
     }
 
-    // 辅助函数
+    // 函数
     function formatTime(sec) {
         if (sec === undefined) return "0:00"
         var m = Math.floor(sec/60)

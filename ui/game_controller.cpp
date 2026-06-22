@@ -77,13 +77,13 @@ void GameController::startGame()
 void GameController::setGameMode(int mode)
 {
     m_gameMode = mode;
-    qDebug() << "Game mode set to" << mode;
+    //qDebug() << "Game mode set to" << mode;
 }
 
 void GameController::setAIDifficulty(int difficulty)
 {
     m_aiDifficulty = difficulty;
-    qDebug() << "AI difficulty set to" << difficulty;
+    //qDebug() << "AI difficulty set to" << difficulty;
 }
 
 bool GameController::startHost(quint16 port)
@@ -180,7 +180,7 @@ int GameController::whiteTime() const { return m_engine.whiteTime(); }
 // 刷新棋盘
 void GameController::refreshBoard()
 {
-    qDebug() << "Refresh board called";
+    //qDebug() << "Refresh board called";
     for (int row = 0; row < Board::SIZE; ++row) {
         for (int col = 0; col < Board::SIZE; ++col) {
             int piece = m_engine.pieceAt(row, col);
@@ -210,7 +210,7 @@ void GameController::onEngineGameOverChanged()
 
 void GameController::onEngineBoardChanged(int row, int col, int player)
 {
-    qDebug() << "Board changed at" << row << col << "player" << player;
+    //qDebug() << "Board changed at" << row << col << "player" << player;
     emit boardChanged(row, col, player);
 }
 
@@ -234,7 +234,7 @@ void GameController::onServerDisconnected()
 
 void GameController::onServerMove(int row, int col)
 {
-    qDebug() << "Server received move:" << row << col;
+    //qDebug() << "Server received move:" << row << col;
     applyRemoteMove(row, col);
 }
 
@@ -269,7 +269,7 @@ void GameController::onClientDisconnected()
 
 void GameController::onClientMove(int row, int col)
 {
-    qDebug() << "Client received move:" << row << col;
+    //qDebug() << "Client received move:" << row << col;
     applyRemoteMove(row, col);
 }
 
@@ -326,20 +326,20 @@ void GameController::applyRemoteMove(int row, int col)
 {
     if (m_engine.isGameOver()) return;
     if (m_processingRemote) return;
-    if (m_engine.pieceAt(row, col) != 0) {
-        qDebug() << "Position already occupied:" << row << col;
-        return;
-    }
+    //if (m_engine.pieceAt(row, col) != 0) {
+        //qDebug() << "Position already occupied:" << row << col;
+        //return;
+    //}
 
     m_processingRemote = true;
 
-    qDebug() << "Applying remote move at" << row << col;
+    //qDebug() << "Applying remote move at" << row << col;
 
     m_engine.placePiece(row, col);
 
     QTimer::singleShot(1, this, [this]() {
         refreshBoard();
-        qDebug() << "Board refreshed after remote move";
+        //qDebug() << "Board refreshed after remote move";
     });
 
     m_processingRemote = false;

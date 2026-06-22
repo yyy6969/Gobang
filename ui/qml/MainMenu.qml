@@ -117,14 +117,14 @@ Rectangle {
             background: Rectangle {
                 color: btn.down ? "#1f2a4e" : (btn.hovered ? "#696969" : "#a9a9a9")
                 radius: 30
-                border.color: "#e94560"
+                border.color: "#708090"
                 border.width: 2
                 Behavior on color { ColorAnimation { duration: 150 } }
             }
             contentItem: Text {
                 text: btn.text
                 font: btn.font
-                color: btn.hovered ? "#ff6b6b" : "#e0e0e0"
+                color: btn.hovered ? "#000000" : "#e0e0e0"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }

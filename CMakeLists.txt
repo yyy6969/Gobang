@@ -5,7 +5,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Qml Quick QuickControls2)
 
 qt_standard_project_setup()
 
-# 只包含真正的 C++ 源文件（删除文档、图片、QML 文件、UI 文件）
+#C++ 源文件
 qt_add_executable(Gonbal_My_Game
     WIN32 MACOSX_BUNDLE
     main.cpp
@@ -20,7 +20,7 @@ qt_add_executable(Gonbal_My_Game
     nerwork/network_player.cpp
 )
 
-# 将 QML 文件编译为资源（qrc）
+# 将 QML 文件编译为资源
 qt6_add_resources(Gonbal_My_Game "qml_resources"
     PREFIX "/"
     FILES
@@ -28,6 +28,9 @@ qt6_add_resources(Gonbal_My_Game "qml_resources"
         ui/qml/MainMenu.qml      # 菜单界面
         ui/qml/GameView.qml      # 棋盘界面
         image/background.jpg
+        image/background2.jpg
+        image/background3.jpg
+        image/background4.jpg
 )
 
 # 链接 Qt 库
