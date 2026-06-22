@@ -376,7 +376,7 @@ Rectangle {
                 Connections {
                     target: game
                     function onBoardChanged(){boardCanvas.requestPaint()}
-                    function onBoardRefreshNeeded() {boardCanvas.requestPaint()}
+
                     function onGameStateChanged() {boardCanvas.requestPaint()}
                 }
 
@@ -668,7 +668,7 @@ Rectangle {
                         onClicked: {
                             boardCanvas.lastRow = -1
                             boardCanvas.lastCol = -1
-                            game.startGame()
+                            game.requestRestart()   // 调用新函数
                             boardCanvas.requestPaint()
                         }
                     }

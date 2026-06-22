@@ -23,6 +23,7 @@ GameServer::~GameServer()
 
 bool GameServer::start(quint16 port)
 {
+
     if (m_server) return false;
     m_server = new QTcpServer(this);
     connect(m_server, &QTcpServer::newConnection, this, &GameServer::onNewConnection);

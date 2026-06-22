@@ -1,15 +1,9 @@
-// File: game_controller.cpp
-// Created: YuHaoRan   1730822455@qq.com   2026-06-22 11:08:47
-// Description:游戏主控制类
 
 #include "game_controller.h"
-#include "../nerwork/game_server.h"
-#include "../nerwork/game_client.h"
+#include "../nerwork/network_player.h"
 #include <QDebug>
 #include <QRandomGenerator>
 #include <QVector>
-#include <algorithm>
-#include <climits>
 #include <QTimer>
 
 static const int DIRS[4][2] = {{0,1}, {1,0}, {1,1}, {1,-1}};
@@ -18,8 +12,7 @@ GameController::GameController(QObject *parent)
     : QObject(parent)
     , m_gameMode(LocalMode)
     , m_aiDifficulty(Medium)
-    , m_server(nullptr)
-    , m_client(nullptr)
+    , m_peer(nullptr)
     , m_isHost(false)
     , m_processingRemote(false)
 {
@@ -32,8 +25,11 @@ GameController::GameController(QObject *parent)
 
 GameController::~GameController()
 {
-    if (m_server) m_server->stop();
-    if (m_client) m_client->disconnect();
+    if (m_peer) {
+        m_peer->disconnect();
+        delete m_peer;
+        m_peer = nullptr;
+    }
 }
 
 int GameController::pieceAt(int row, int col) const
@@ -62,7 +58,7 @@ void GameController::placePiece(int row, int col)
     m_engine.placePiece(row, col);
 
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
-        sendMoveToPeer(row, col);
+        if (m_peer) m_peer->sendMove(row, col);
     }
 }
 
@@ -77,47 +73,81 @@ void GameController::startGame()
 void GameController::setGameMode(int mode)
 {
     m_gameMode = mode;
-    //qDebug() << "Game mode set to" << mode;
 }
 
 void GameController::setAIDifficulty(int difficulty)
 {
     m_aiDifficulty = difficulty;
-    //qDebug() << "AI difficulty set to" << difficulty;
 }
 
 bool GameController::startHost(quint16 port)
 {
-    if (m_server) return false;
-    m_server = new GameServer(this);
-    connect(m_server, &GameServer::clientConnected, this, &GameController::onServerConnected);
-    connect(m_server, &GameServer::clientDisconnected, this, &GameController::onServerDisconnected);
-    connect(m_server, &GameServer::moveReceived, this, &GameController::onServerMove);
-    connect(m_server, &GameServer::gameOverReceived, this, &GameController::onServerGameOver);
-    connect(m_server, &GameServer::chatReceived, this, &GameController::onServerChat);
-    connect(m_server, &GameServer::giveUpReceived, this, &GameController::onServerGiveUp);
-    connect(m_server, &GameServer::errorOccurred, this, &GameController::onNetworkError);
+    if (m_peer) return false;  // 已有网络连接
+    m_peer = new NetworkPeer(this);
+    // 连接统一信号
+    connect(m_peer, &NetworkPeer::connected, this, &GameController::onPeerConnected);
+    connect(m_peer, &NetworkPeer::disconnected, this, &GameController::onPeerDisconnected);
+    connect(m_peer, &NetworkPeer::moveReceived, this, &GameController::onPeerMove);
+    connect(m_peer, &NetworkPeer::chatReceived, this, &GameController::onPeerChat);
+    connect(m_peer, &NetworkPeer::giveUpReceived, this, &GameController::onPeerGiveUp);
+    connect(m_peer, &NetworkPeer::restartReceived, this, &GameController::onPeerRestart);
+    // 本地引擎处理游戏是否结束操作
 
-    if (!m_server->start(port)) return false;
+    if (!m_peer->startServer(port)) {
+        delete m_peer;
+        m_peer = nullptr;
+        return false;
+    }
     setNetworkStatus("等待客户端连接...");
     m_gameMode = NetworkHostMode;
     m_isHost = true;
     return true;
 }
 
+
+void GameController::onPeerRestart()
+{
+    // 重置游戏引擎
+    m_engine.startGame();
+    // 更新网络状态（可根据角色设置提示）
+    if (m_isHost)
+        setNetworkStatus("已重新开始，黑棋先走");
+    else
+        setNetworkStatus("已重新开始，您是白棋");
+}
+
+
+void GameController::requestRestart()
+{
+    if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
+        if (m_peer) m_peer->sendRestart();
+        // 本地立即重置，避免等待对方延迟
+        m_engine.startGame();
+        if (m_isHost)
+            setNetworkStatus("已重新开始，黑棋先走");
+        else
+            setNetworkStatus("已重新开始，您是白棋");
+    } else {
+        // 本地或 AI 模式直接重置
+        m_engine.startGame();
+    }
+}
+
 bool GameController::connectToServer(const QString &ip, quint16 port)
 {
-    if (m_client) return false;
-    m_client = new GameClient(this);
-    connect(m_client, &GameClient::connected, this, &GameController::onClientConnected);
-    connect(m_client, &GameClient::disconnected, this, &GameController::onClientDisconnected);
-    connect(m_client, &GameClient::moveReceived, this, &GameController::onClientMove);
-    connect(m_client, &GameClient::gameOverReceived, this, &GameController::onClientGameOver);
-    connect(m_client, &GameClient::chatReceived, this, &GameController::onClientChat);
-    connect(m_client, &GameClient::giveUpReceived, this, &GameController::onClientGiveUp);
-    connect(m_client, &GameClient::errorOccurred, this, &GameController::onNetworkError);
+    if (m_peer) return false;
+    m_peer = new NetworkPeer(this);
+    connect(m_peer, &NetworkPeer::connected, this, &GameController::onPeerConnected);
+    connect(m_peer, &NetworkPeer::disconnected, this, &GameController::onPeerDisconnected);
+    connect(m_peer, &NetworkPeer::moveReceived, this, &GameController::onPeerMove);
+    connect(m_peer, &NetworkPeer::chatReceived, this, &GameController::onPeerChat);
+    connect(m_peer, &NetworkPeer::giveUpReceived, this, &GameController::onPeerGiveUp);
 
-    if (!m_client->connectToServer(ip, port)) return false;
+    if (!m_peer->connectToHost(ip, port)) {
+        delete m_peer;
+        m_peer = nullptr;
+        return false;
+    }
     setNetworkStatus("正在连接...");
     m_gameMode = NetworkClientMode;
     m_isHost = false;
@@ -126,49 +156,41 @@ bool GameController::connectToServer(const QString &ip, quint16 port)
 
 void GameController::cancelNetwork()
 {
-    if (m_server) { m_server->stop(); delete m_server; m_server = nullptr; }
-    if (m_client) { m_client->disconnect(); delete m_client; m_client = nullptr; }
+    if (m_peer) {
+        m_peer->disconnect();
+        delete m_peer;
+        m_peer = nullptr;
+    }
     setNetworkStatus("");
     m_gameMode = LocalMode;
-    m_pendingMoves.clear();
 }
 
 void GameController::sendChat(const QString &msg)
 {
     if (msg.trimmed().isEmpty()) return;
     QString name = m_isHost ? "主机" : "客户端";
-    if (m_server) {
-        m_server->sendChat(name, msg);
-    } else if (m_client) {
-        m_client->sendChat(name, msg);
+    if (m_peer) {
+        m_peer->sendChat(name, msg);
     } else {
         return;
     }
     appendChat("我", msg);
 }
 
-//giveUp 函数
 void GameController::giveUp()
 {
     if (m_engine.isGameOver()) return;
 
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
-        sendGiveUpToPeer();
+        if (m_peer) m_peer->sendGiveUp();
         QString winner = m_isHost ? "白方" : "黑方";
         m_engine.endGame(winner + "（对方认输）");
     } else if (m_gameMode == AIMode) {
         m_engine.endGame("您认输了，AI 获胜！");
     } else if (m_gameMode == LocalMode) {
-        // 本地模式：认输后结束游戏
         QString winner = m_engine.currentPlayer() == 0 ? "白方" : "黑方";
         m_engine.endGame(winner + "（认输）");
     }
-}
-
-void GameController::sendGiveUpToPeer()
-{
-    if (m_server) m_server->sendGiveUp();
-    else if (m_client) m_client->sendGiveUp();
 }
 
 int GameController::currentPlayer() const { return m_engine.currentPlayer(); }
@@ -177,20 +199,6 @@ QString GameController::winnerText() const { return m_engine.winnerText(); }
 int GameController::blackTime() const { return m_engine.blackTime(); }
 int GameController::whiteTime() const { return m_engine.whiteTime(); }
 
-// 刷新棋盘
-void GameController::refreshBoard()
-{
-    //qDebug() << "Refresh board called";
-    for (int row = 0; row < Board::SIZE; ++row) {
-        for (int col = 0; col < Board::SIZE; ++col) {
-            int piece = m_engine.pieceAt(row, col);
-            if (piece != 0) {
-                emit boardChanged(row, col, piece - 1);
-            }
-        }
-    }
-    emit boardRefreshNeeded();
-}
 
 void GameController::onEngineTurnChanged()
 {
@@ -204,13 +212,12 @@ void GameController::onEngineGameOverChanged()
 {
     emit gameStateChanged();
     if (m_engine.isGameOver() && (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode)) {
-        sendGameOverToPeer(m_engine.winnerText());
+        if (m_peer) m_peer->sendGameOver(m_engine.winnerText());
     }
 }
 
 void GameController::onEngineBoardChanged(int row, int col, int player)
 {
-    //qDebug() << "Board changed at" << row << col << "player" << player;
     emit boardChanged(row, col, player);
 }
 
@@ -219,83 +226,40 @@ void GameController::onEngineTimeChanged()
     emit gameStateChanged();
 }
 
-// ---- 网络槽函数 ----
-void GameController::onServerConnected()
+// ---- 统一的网络槽 ----辨识下角色身份操作
+void GameController::onPeerConnected()
 {
-    setNetworkStatus("已连接，黑棋先走");
+    if (m_isHost)
+        setNetworkStatus("已连接，黑棋先走");
+    else
+        setNetworkStatus("已连接，您是白棋");
     startGame();
 }
 
-void GameController::onServerDisconnected()
+void GameController::onPeerDisconnected()
 {
-    setNetworkStatus("对方断开连接");
-    cancelNetwork();
+    setNetworkStatus(m_isHost ? "客户端断开连接" : "服务器断开连接");
+    cancelNetwork(); // 返回到本地端
 }
 
-void GameController::onServerMove(int row, int col)
+void GameController::onPeerMove(int row, int col)
 {
-    //qDebug() << "Server received move:" << row << col;
     applyRemoteMove(row, col);
 }
 
-void GameController::onServerGameOver(const QString &winner)
-{
-    Q_UNUSED(winner);
-}
-
-void GameController::onServerChat(const QString &name, const QString &msg)
+void GameController::onPeerChat(const QString &name, const QString &msg)
 {
     appendChat(name, msg);
 }
 
-void GameController::onServerGiveUp()
+void GameController::onPeerGiveUp()
 {
     if (!m_engine.isGameOver()) {
         m_engine.endGame("对方认输，您获胜！");
     }
 }
 
-void GameController::onClientConnected()
-{
-    setNetworkStatus("已连接，您是白棋");
-    startGame();
-}
-
-void GameController::onClientDisconnected()
-{
-    setNetworkStatus("服务器断开连接");
-    cancelNetwork();
-}
-
-void GameController::onClientMove(int row, int col)
-{
-    //qDebug() << "Client received move:" << row << col;
-    applyRemoteMove(row, col);
-}
-
-void GameController::onClientGameOver(const QString &winner)
-{
-    Q_UNUSED(winner);
-}
-
-void GameController::onClientChat(const QString &name, const QString &msg)
-{
-    appendChat(name, msg);
-}
-
-void GameController::onClientGiveUp()
-{
-    if (!m_engine.isGameOver()) {
-        m_engine.endGame("对方认输，您获胜！");
-    }
-}
-
-void GameController::onNetworkError(const QString &msg)
-{
-    setNetworkStatus("网络错误: " + msg);
-    cancelNetwork();
-}
-
+// ---- 网络辅助函数 ----
 void GameController::setNetworkStatus(const QString &status)
 {
     if (m_networkStatus == status) return;
@@ -309,43 +273,18 @@ void GameController::appendChat(const QString &name, const QString &msg)
     emit chatHistoryChanged();
 }
 
-void GameController::sendMoveToPeer(int row, int col)
-{
-    if (m_server) m_server->sendMove(row, col);
-    else if (m_client) m_client->sendMove(row, col);
-}
-
-void GameController::sendGameOverToPeer(const QString &winner)
-{
-    if (m_server) m_server->sendGameOver(winner);
-    else if (m_client) m_client->sendGameOver(winner);
-}
-
-// 远程落子
 void GameController::applyRemoteMove(int row, int col)
 {
     if (m_engine.isGameOver()) return;
     if (m_processingRemote) return;
-    //if (m_engine.pieceAt(row, col) != 0) {
-        //qDebug() << "Position already occupied:" << row << col;
-        //return;
-    //}
 
     m_processingRemote = true;
-
-    //qDebug() << "Applying remote move at" << row << col;
-
     m_engine.placePiece(row, col);
-
-    QTimer::singleShot(1, this, [this]() {
-        refreshBoard();
-        //qDebug() << "Board refreshed after remote move";
-    });
-
     m_processingRemote = false;
+    // 发出 boardChanged 信号-----通知更新期盼
 }
 
-// ---- AI 函数 ----
+// ---- AI 函数
 void GameController::aiMove()
 {
     static bool aiBusy = false;
@@ -462,15 +401,4 @@ int GameController::evaluatePosition(int row, int col, int pieceColor) const
         else if (count == 1) total += 1;
     }
     return total;
-}
-
-bool GameController::isNearPiece(int row, int col, int distance) const
-{
-    for (int i = -distance; i <= distance; ++i)
-        for (int j = -distance; j <= distance; ++j) {
-            int nr = row + i, nc = col + j;
-            if (nr>=0 && nr<Board::SIZE && nc>=0 && nc<Board::SIZE)
-                if (m_engine.pieceAt(nr, nc) != 0) return true;
-        }
-    return false;
 }

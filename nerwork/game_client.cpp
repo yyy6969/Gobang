@@ -26,10 +26,8 @@ bool GameClient::connectToServer(const QString &ip, quint16 port)
     if (m_socket) return false;
     m_socket = new QTcpSocket(this);
     connect(m_socket, &QTcpSocket::connected, this, &GameClient::onConnected);
-    connect(m_socket, &QTcpSocket::disconnected, this, &GameClient::onDisconnected);
     connect(m_socket, &QTcpSocket::readyRead, this, &GameClient::onReadyRead);
-    connect(m_socket, &QTcpSocket::errorOccurred, this, &GameClient::onError);
-    m_socket->connectToHost(ip, port);
+    m_socket->connectToHost(ip, port);//进行输入然后连接操作
     return true;
 }
 

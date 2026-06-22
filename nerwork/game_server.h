@@ -13,7 +13,7 @@ public:
     explicit GameServer(QObject *parent = nullptr);
     ~GameServer();
 
-    bool start(quint16 port);
+    bool start(quint16 port);//创建套接字，然后对客户端进行监听操作
     void stop();
 
     // 发送各种指令
