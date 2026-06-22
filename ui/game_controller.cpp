@@ -1,3 +1,7 @@
+// File: game_controller.cpp
+// Created: YuHaoRan   1730822455@qq.com   2026-06-22 11:08:47
+// Description:游戏主控制类
+
 #include "game_controller.h"
 #include "../nerwork/game_server.h"
 #include "../nerwork/game_client.h"

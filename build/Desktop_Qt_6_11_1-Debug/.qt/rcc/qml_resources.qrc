@@ -3,6 +3,7 @@
     <file alias="ui/qml/main.qml">/myWork/train/Gobang/ui/qml/main.qml</file>
     <file alias="ui/qml/MainMenu.qml">/myWork/train/Gobang/ui/qml/MainMenu.qml</file>
     <file alias="ui/qml/GameView.qml">/myWork/train/Gobang/ui/qml/GameView.qml</file>
+    <file alias="image/background.jpg">/myWork/train/Gobang/image/background.jpg</file>
   </qresource>
 </RCC>
 

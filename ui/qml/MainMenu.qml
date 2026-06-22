@@ -1,3 +1,6 @@
+// File: game_controller.cpp
+// Created: YuHaoRan   1730822455@qq.com   2026-06-22 11:09:56
+// Description:游戏主页组件
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -11,6 +14,13 @@ Rectangle {
     signal localGame()
     signal aiGame(int difficulty)   // 难度: 0简单,1一般,2困难
     signal lanGameStart()
+
+    Image {
+        id: background
+        source:"qrc:/image/background.jpg"
+        fillMode: Image.PreserveAspectCrop
+        opacity: 0.7
+    }
 
     // 局域网连接对话框
     Dialog {
@@ -70,23 +80,13 @@ Rectangle {
         }
     }
 
-    // 背景装饰
-    Rectangle {
-        anchors.centerIn: parent
-        width: parent.width * 0.8
-        height: parent.height * 0.6
-        radius: 300
-        color: "#0f3460"
-        opacity: 0.4
-    }
-
     Text {
         id: title
         text: "五子棋"
         font.pixelSize: 56
         font.bold: true
-        font.family: "Microsoft YaHei"
-        color: "#e94560"
+        font.family: "FZSuXinShiLiuKaiS-R-GB"
+        color: "#000000"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: 80
@@ -96,7 +96,7 @@ Rectangle {
         text: "Gomoku · 五子连珠"
         font.pixelSize: 18
         font.italic: true
-        color: "#a0a0c0"
+        color: "#f0fff0"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: title.bottom
         anchors.topMargin: 12
@@ -115,7 +115,7 @@ Rectangle {
             font.pixelSize: 20
             font.bold: true
             background: Rectangle {
-                color: btn.down ? "#1f2a4e" : (btn.hovered ? "#1f2a4e" : "#16213e")
+                color: btn.down ? "#1f2a4e" : (btn.hovered ? "#696969" : "#a9a9a9")
                 radius: 30
                 border.color: "#e94560"
                 border.width: 2
@@ -159,7 +159,7 @@ Rectangle {
                 font.pixelSize: 14
                 implicitWidth: 100
                 background: Rectangle {
-                    color: "#2a2a4a"
+                    color: "#a9a9a9"
                     radius: 6
                 }
                 contentItem: Text {
@@ -170,14 +170,20 @@ Rectangle {
                     verticalAlignment: Text.AlignVCenter
                 }
                 delegate: ItemDelegate {
+                    id:delegate
                     width: aiCombo.width
                     contentItem: Text {
                         text: modelData
-                        color: "white"
+                        color:"#000000"
                         font.pixelSize: 14
                     }
                     background: Rectangle {
-                        color: parent.highlighted ? "#e94560" : "#2a2a4a"
+                        color:  delegate.hovered? "#708090" : "#a9a9a9"
+                        Behavior on color{
+                            ColorAnimation {
+                                duration: 60
+                            }
+                        }
                     }
                 }
             }
@@ -191,9 +197,9 @@ Rectangle {
     }
 
     Text {
-        text: "v1.0 · 支持局域网对战 & 三档AI"
+        text: "v2.0 · 支持局域网对战 & 三档AI"
         font.pixelSize: 12
-        color: "#606080"
+        color: "#f0ffff"
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 20
         anchors.horizontalCenter: parent.horizontalCenter
