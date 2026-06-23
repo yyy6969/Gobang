@@ -7,13 +7,16 @@ import QtQuick.Controls 2.15
 ApplicationWindow {
     id: root
     visible: true
-    width: 1000
-    height: 700
+    // 改为根据屏幕动态计算
+    width: Screen.width
+    height: Screen.height
+    minimumWidth: width
+    maximumWidth: width
+    minimumHeight: height
+    maximumHeight: height
     title: "五子棋"
-    minimumWidth: 1000
-       maximumWidth: 1000
-       minimumHeight: 700
-       maximumHeight: 700
+
+    property real scaleFactor: Math.min(Screen.width / 1080, Screen.height / 1920)
 
     StackView {
         id: stackView
@@ -42,6 +45,7 @@ ApplicationWindow {
     Component {
         id: gamePage
         GameView {
+            scaleFactor: root.scaleFactor
             onBackToMenu: {
                 game.cancelNetwork()
                 stackView.pop()

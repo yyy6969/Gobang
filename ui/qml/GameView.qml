@@ -5,9 +5,11 @@ Rectangle {
     id: root
     //color: "#2c3e50"
 
+    property real scaleFactor: 1.0  // 默认 1，由 main.qml 赋值
+
     property string gameMode: "local"
     signal backToMenu()
-    property int cellSize: 38
+    property int cellSize: 38* root.scaleFactor
     property int boardSize: 15
 
     // 动态顶部高度（网络状态栏可见时增加30px）

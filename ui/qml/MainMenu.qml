@@ -7,8 +7,8 @@ import QtQuick.Layouts 1.15
 
 Rectangle {
     id: menuRoot
-    width: 1000
-    height: 700
+    width: Screen.width
+        height: Screen.height
     color: "#1a1a2e"
 
     signal localGame()
