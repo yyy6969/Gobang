@@ -1,20 +1,14 @@
 cmake_minimum_required(VERSION 3.19)
+project(Gonbal_My_Game)
 
-# ============ 查找 Qt6 模块 ============
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2 Network)
 
 qt_standard_project_setup()
 
-# ============ 平台特定设置 ============
 if(ANDROID)
-    # 指定要构建的 ABI（根据需要调整）
     set(QT_ANDROID_ABIS arm64-v8a armeabi-v7a)
-    # 可选：设置最低 API 级别，默认 31
-    # set(ANDROID_API_VERSION 31)
 endif()
-# =====================================
 
-# ---------- 源文件 ----------
 qt_add_executable(Gonbal_My_Game
     WIN32 MACOSX_BUNDLE
     main.cpp
@@ -28,14 +22,14 @@ qt_add_executable(Gonbal_My_Game
     nerwork/game_server.cpp
     nerwork/network_player.cpp
     core/datamanager.cpp
-
     documents/skloten_project.txt
     documents/Statues.png
     documents/uml.png
-
 )
 
-# ---------- 头文件 ----------
+set_target_properties(Gonbal_My_Game PROPERTIES
+   QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+
 target_sources(Gonbal_My_Game PRIVATE
     ui/game_controller.h
     core/ai_player.h
@@ -49,7 +43,6 @@ target_sources(Gonbal_My_Game PRIVATE
     nerwork/network_player.h
 )
 
-# ---------- QML 资源 ----------
 qt6_add_resources(Gonbal_My_Game "qml_resources"
     PREFIX "/"
     FILES
@@ -62,12 +55,14 @@ qt6_add_resources(Gonbal_My_Game "qml_resources"
         image/background4.jpg
 )
 
-# ---------- 链接库 ----------
-# 桌面平台：使用系统 SQLite
-# Android：暂不链接 SQLite
 if(NOT ANDROID)
     target_link_libraries(Gonbal_My_Game PRIVATE SQLite::SQLite3)
 endif()
+
+find_package(Qt6 REQUIRED COMPONENTS Nfc)
+
+# 关键：指向 android 子目录
+set(QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android)
 
 target_link_libraries(Gonbal_My_Game PRIVATE
     Qt::Core
@@ -75,10 +70,24 @@ target_link_libraries(Gonbal_My_Game PRIVATE
     Qt::Quick
     Qt::QuickControls2
     Qt::Network
+    Qt6::Nfc
 )
 
-# ---------- 部署设置 ----------
-# 桌面平台：使用标准安装和部署脚本
+
+if(ANDROID)
+    # 获取构建输出目录（androiddeployqt 的输出路径）
+    set(ANDROID_DEPLOY_DIR "${CMAKE_BINARY_DIR}/android-build")
+
+    # 在构建前，强制复制自定义资源到部署目录
+    add_custom_command(TARGET Gonbal_My_Game PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying custom Android resources..."
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/android
+            ${ANDROID_DEPLOY_DIR}
+        COMMENT "Overriding default Android resources with custom ones"
+    )
+endif()
+
 if(NOT ANDROID)
     include(GNUInstallDirs)
     install(TARGETS Gonbal_My_Game
@@ -88,4 +97,3 @@ if(NOT ANDROID)
     qt_generate_deploy_app_script(TARGET Gonbal_My_Game OUTPUT_SCRIPT deploy_script)
     install(SCRIPT ${deploy_script})
 endif()
-

@@ -8,11 +8,11 @@ import QtQuick.Layouts 1.15
 Rectangle {
     id: menuRoot
     width: Screen.width
-        height: Screen.height
+    height: Screen.height
     color: "#1a1a2e"
 
     signal localGame()
-    signal aiGame(int difficulty)   // 难度: 0简单,1一般,2困难
+    signal aiGame(int difficulty)
     signal lanGameStart()
 
     Image {
@@ -28,58 +28,129 @@ Rectangle {
         modal: true
         focus: true
         title: "局域网对战"
-        standardButtons: Dialog.Ok | Dialog.Cancel
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
         width: 300
-        height: 200
+        height: 380
 
         property bool isHost: true
         property string serverIp: "127.0.0.1"
         property int port: 8888
+        property string connectionMethod: "ip"
 
         ColumnLayout {
             anchors.fill: parent
             spacing: 10
 
+            // 连接方式选择
             RowLayout {
+                spacing: 20
+                Layout.alignment: Qt.AlignHCenter
+
                 RadioButton {
-                    text: "创建房间"
+                    text: "IP连接"
                     checked: true
-                    onCheckedChanged: { if (checked) lanDialog.isHost = true }
+                    onCheckedChanged: { if (checked) lanDialog.connectionMethod = "ip" }
                 }
                 RadioButton {
-                    text: "加入房间"
-                    onCheckedChanged: { if (checked) lanDialog.isHost = false }
+                    text: "NFC连接"
+                    onCheckedChanged: { if (checked) lanDialog.connectionMethod = "nfc" }
                 }
+            }
+
+            // IP 设置区域（原有逻辑）
+            ColumnLayout {
+                spacing: 10
+                visible: lanDialog.connectionMethod === "ip"
+
+                RowLayout {
+                    RadioButton {
+                        text: "创建房间"
+                        checked: true
+                        onCheckedChanged: { if (checked) lanDialog.isHost = true }
+                    }
+                    RadioButton {
+                        text: "加入房间"
+                        onCheckedChanged: { if (checked) lanDialog.isHost = false }
+                    }
+                }
+
+                RowLayout {
+                    visible: !lanDialog.isHost
+                    Label { text: "服务器IP:" }
+                    TextField {
+                        text: lanDialog.serverIp
+                        onTextChanged: lanDialog.serverIp = text
+                    }
+                }
+
+                RowLayout {
+                    Label { text: "端口:" }
+                    TextField {
+                        text: "8888"
+                        validator: IntValidator { bottom: 1024; top: 65535 }
+                        onTextChanged: lanDialog.port = parseInt(text)
+                    }
+                }
+            }
+
+            // NFC 占位提示
+            Label {
+                visible: lanDialog.connectionMethod === "nfc"
+                text: "NFC 功能开发中"
+                color: "gray"
+                font.italic: true
+                Layout.alignment: Qt.AlignHCenter
             }
 
             RowLayout {
-                visible: !lanDialog.isHost
-                Label { text: "服务器IP:" }
-                TextField {
-                    text: lanDialog.serverIp
-                    onTextChanged: lanDialog.serverIp = text
+                spacing: 20
+                Layout.alignment: Qt.AlignRight
+
+                Button {
+                    text: "确定"
+                    onClicked: {
+                        if (lanDialog.connectionMethod === "nfc") {
+                            nfcHintDialog.open()
+                            return
+                        }
+                        if (isHost) game.startHost(port)
+                        else game.connectToServer(serverIp, port)
+                        lanGameStart()
+                        lanDialog.close()
+                    }
+                }
+                Button {
+                    text: "取消"
+                    onClicked: lanDialog.close()
                 }
             }
-
-            RowLayout {
-                Label { text: "端口:" }
-                TextField {
-                    text: "8888"
-                    validator: IntValidator { bottom: 1024; top: 65535 }
-                    onTextChanged: lanDialog.port = parseInt(text)
-                }
-            }
-        }
-
-        onAccepted: {
-            if (isHost) game.startHost(port)
-            else game.connectToServer(serverIp, port)
-            lanGameStart()
         }
     }
 
+    // NFC 提示对话框--空壳
+    Dialog {
+        id: nfcHintDialog
+        modal: true
+        focus: true
+        title: "提示"
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        width: 250
+        height: 120
+        standardButtons: Dialog.Ok
+
+        Label {
+            anchors.centerIn: parent
+            text: "NFC 功能暂未实现，请使用 IP 连接。"
+            color: "black"
+            font.pixelSize: 14
+        }
+
+        onAccepted: close()
+    }
+
+    // 以下为原有界面元素
     Text {
         id: title
         text: "五子棋"
@@ -107,7 +178,6 @@ Rectangle {
         spacing: 20
         width: 280
 
-        // 通用按钮样式
         component GameButton: Button {
             id: btn
             width: 280
@@ -130,20 +200,17 @@ Rectangle {
             }
         }
 
-        // 本地对战
         GameButton {
             text: "🏠 本地对战"
             onClicked: localGame()
         }
 
-        // 人机对战按钮
         GameButton {
             id: aiButton
             text: "🤖 人机对战"
             onClicked: aiGame(aiCombo.currentIndex)
         }
 
-        // 难度选择区域
         RowLayout {
             spacing: 10
             Layout.alignment: Qt.AlignHCenter
@@ -170,7 +237,7 @@ Rectangle {
                     verticalAlignment: Text.AlignVCenter
                 }
                 delegate: ItemDelegate {
-                    id:delegate
+                    id: delegate
                     width: aiCombo.width
                     contentItem: Text {
                         text: modelData
@@ -178,18 +245,13 @@ Rectangle {
                         font.pixelSize: 14
                     }
                     background: Rectangle {
-                        color:  delegate.hovered? "#708090" : "#a9a9a9"
-                        Behavior on color{
-                            ColorAnimation {
-                                duration: 60
-                            }
-                        }
+                        color: delegate.hovered? "#708090" : "#a9a9a9"
+                        Behavior on color { ColorAnimation { duration: 60 } }
                     }
                 }
             }
         }
 
-        // 局域网对战
         GameButton {
             text: "🌐 局域网对战"
             onClicked: lanDialog.open()

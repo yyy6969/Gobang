@@ -1,0 +1,5 @@
+/run/media/root/E/QTQTQTQTQTQTQTQTTQTQTQTQTQTQT/android-sdk/emulator/emulator -list-avds
+
+
+
+/run/media/root/E/QTQTQTQTQTQTQTQTTQTQTQTQTQTQT/android-sdk/emulator/emulator -avd 你的设备名 -verbose
