@@ -77,6 +77,6 @@ UI反馈：无错误信息处理，仅状态文本（由上层决定）
 
 1:在关于grandle包无法下载时候,进入下载离线版本,然后点击运行出现配置文件,去build/android-build-Gonbal_My_Game\gradle\wrapper下添加路径
 
-2:
+2:在项目的安卓构建目录下去选择下创建xml文件操作
 
-
+GameController::startHost(quint16 port) 和 connectToServer(QString ip, quint16 port) 直接调用启动nfc

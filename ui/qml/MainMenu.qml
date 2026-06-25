@@ -22,7 +22,7 @@ Rectangle {
         opacity: 0.7
     }
 
-    // 局域网连接对话框
+    // 局域网连接对话框+nfc
     Dialog {
         id: lanDialog
         modal: true
@@ -37,16 +37,48 @@ Rectangle {
         property string serverIp: "127.0.0.1"
         property int port: 8888
         property string connectionMethod: "ip"
+        property string nfcStatusText: ""   // 新增
+
+        // 统一处理“确定”操作
+        onAccepted: {
+            if (connectionMethod === "nfc") {
+                // NFC 模式
+                var ip = nfcManager.getLocalIp()
+                if (ip === "") {
+                    nfcErrorDialog.text = "无法获取本机 IP，请检查网络连接"
+                    nfcErrorDialog.open()
+                    return
+                }
+                var rand = Math.floor(Math.random() * 10000)
+                if (!nfcManager.startShare(ip, port, rand)) {
+                    // 错误由 errorOccurred 信号处理
+                    return
+                }
+                nfcStatusText = "正在配对，请将两部手机背部靠近..."
+                return   // 不关闭对话框，等待配对成功
+            }
+            // IP 模式
+            if (isHost) game.startHost(port)
+            else game.connectToServer(serverIp, port)
+            lanGameStart()
+            close()
+        }
+
+        // 取消操作（停止 NFC）
+        onRejected: {
+            if (connectionMethod === "nfc") {
+                nfcManager.stop()
+            }
+            close()
+        }
 
         ColumnLayout {
             anchors.fill: parent
             spacing: 10
 
-            // 连接方式选择
             RowLayout {
                 spacing: 20
                 Layout.alignment: Qt.AlignHCenter
-
                 RadioButton {
                     text: "IP连接"
                     checked: true
@@ -58,7 +90,6 @@ Rectangle {
                 }
             }
 
-            // IP 设置区域（原有逻辑）
             ColumnLayout {
                 spacing: 10
                 visible: lanDialog.connectionMethod === "ip"
@@ -94,13 +125,15 @@ Rectangle {
                 }
             }
 
-            // NFC 占位提示
-            Label {
+            // NFC 显示区域
+            ColumnLayout {
                 visible: lanDialog.connectionMethod === "nfc"
-                text: "NFC 功能开发中"
-                color: "gray"
-                font.italic: true
-                Layout.alignment: Qt.AlignHCenter
+                Label {
+                    text: lanDialog.nfcStatusText !== "" ? lanDialog.nfcStatusText : "点击确定开始配对"
+                    color: lanDialog.nfcStatusText.startsWith("正在") ? "green" : "gray"
+                    font.italic: true
+                    Layout.alignment: Qt.AlignHCenter
+                }
             }
 
             RowLayout {
@@ -109,20 +142,11 @@ Rectangle {
 
                 Button {
                     text: "确定"
-                    onClicked: {
-                        if (lanDialog.connectionMethod === "nfc") {
-                            nfcHintDialog.open()
-                            return
-                        }
-                        if (isHost) game.startHost(port)
-                        else game.connectToServer(serverIp, port)
-                        lanGameStart()
-                        lanDialog.close()
-                    }
+                    onClicked: lanDialog.accept()
                 }
                 Button {
                     text: "取消"
-                    onClicked: lanDialog.close()
+                    onClicked: lanDialog.reject()
                 }
             }
         }
