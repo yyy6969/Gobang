@@ -6,15 +6,17 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "ui/game_controller.h"
-
+#include "core/databasemanager.h"
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     GameController gameController;
+    DatabaseManager dbmanager;
     QQmlApplicationEngine engine;
 
     engine.rootContext()->setContextProperty("game", &gameController);
+    engine.rootContext()->setContextProperty("dbManager",&dbmanager);
     engine.load(QUrl("qrc:/ui/qml/main.qml"));
 
     if (engine.rootObjects().isEmpty())

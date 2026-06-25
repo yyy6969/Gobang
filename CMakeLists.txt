@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(Gonbal_My_Game)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2 Network)
+find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2 Network Sql)
 
 qt_standard_project_setup()
 
@@ -25,6 +25,7 @@ qt_add_executable(Gonbal_My_Game
     documents/skloten_project.txt
     documents/Statues.png
     documents/uml.png
+    core/databasemanager.h core/databasemanager.cpp
 )
 
 set_target_properties(Gonbal_My_Game PROPERTIES
@@ -71,6 +72,7 @@ target_link_libraries(Gonbal_My_Game PRIVATE
     Qt::QuickControls2
     Qt::Network
     Qt6::Nfc
+    Qt::Sql
 )
 
 
