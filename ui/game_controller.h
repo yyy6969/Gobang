@@ -87,6 +87,10 @@ signals:
     // 当聊天历史更新时发射
     void chatHistoryChanged();
 
+
+    //开始加载允许下
+    void lanGameStart();
+
 private slots:
     // 引擎回合变化时的处理（触发 AI 走棋或界面更新）
     void onEngineTurnChanged();

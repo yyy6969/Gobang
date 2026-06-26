@@ -25,7 +25,12 @@ qt_add_executable(Gonbal_My_Game
     documents/skloten_project.txt
     documents/Statues.png
     documents/uml.png
+
     core/databasemanager.h core/databasemanager.cpp
+
+
+    nerwork/nfcmanager.h nerwork/nfcmanager.cpp
+
 
 )
 
@@ -62,7 +67,7 @@ if(NOT ANDROID)
     target_link_libraries(Gonbal_My_Game PRIVATE SQLite::SQLite3)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Nfc)
+find_package(Qt6 REQUIRED COMPONENTS Nfc CorePrivate)
 
 # 关键：指向 android 子目录
 set(QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android)
@@ -75,6 +80,7 @@ target_link_libraries(Gonbal_My_Game PRIVATE
     Qt::Network
     Qt6::Nfc
     Qt::Sql
+    Qt6::CorePrivate
 )
 
 

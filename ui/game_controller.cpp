@@ -84,7 +84,12 @@ void GameController::setAIDifficulty(int difficulty)
 
 bool GameController::startHost(quint16 port)
 {
-    if (m_peer) return false;  // 已有网络连接
+    // 如果已有连接，先彻底清理
+    if (m_peer) {
+        m_peer->disconnect();
+        delete m_peer;
+        m_peer = nullptr;
+    }
     m_peer = new NetworkPeer(this);
     // 连接统一信号
     connect(m_peer, &NetworkPeer::connected, this, &GameController::onPeerConnected);

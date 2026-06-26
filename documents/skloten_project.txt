@@ -80,3 +80,12 @@ UI反馈：无错误信息处理，仅状态文本（由上层决定）
 2:在项目的安卓构建目录下去选择下创建xml文件操作
 
 GameController::startHost(quint16 port) 和 connectToServer(QString ip, quint16 port) 直接调用启动nfc
+
+
+
+
+NfcManager 使用了 Qt 的 QNearFieldManager 的 P2P 模式（writeNdefMessages / readNdefMessages），
+这在 Android 10+ 已完全失效，因为底层依赖的 Android Beam 已被移除。
+NfcAdapter.setNdefPushMessage 这个方法在 Android 10+ 被标记为弃用
+，在较新的 Android 版本中可能已被彻底移除
+需要调用原生的java代码的api接口
