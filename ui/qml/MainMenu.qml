@@ -1,6 +1,5 @@
-// File: game_controller.cpp
-// Created: YuHaoRan   1730822455@qq.com   2026-06-22 11:09:56
-// Description:游戏主页组件
+// File: MainMenu.qml
+// 游戏主页组件（NFC 功能已注释，保留 IP 局域网模式）
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -17,12 +16,13 @@ Rectangle {
 
     Image {
         id: background
-        source:"qrc:/image/background.jpg"
+        anchors.fill: parent
+        source: "qrc:/image/background.jpg"
         fillMode: Image.PreserveAspectCrop
         opacity: 0.7
     }
 
-    // 局域网连接对话框+nfc
+    // ==================== 局域网连接对话框 ====================
     Dialog {
         id: lanDialog
         modal: true
@@ -36,39 +36,39 @@ Rectangle {
         property bool isHost: true
         property string serverIp: "127.0.0.1"
         property int port: 8888
-        property string connectionMethod: "ip"
-        property string nfcStatusText: ""   // 新增
+        // NFC 相关属性（已注释，保留备用）
+        // property string connectionMethod: "ip"
+        // property string nfcStatusText: ""
 
         // 统一处理“确定”操作
         onAccepted: {
-            if (connectionMethod === "nfc") {
-                // NFC 模式
-                var ip = nfcManager.getLocalIp()
-                if (ip === "") {
-                    nfcErrorDialog.text = "无法获取本机 IP，请检查网络连接"
-                    nfcErrorDialog.open()
-                    return
-                }
-                var rand = Math.floor(Math.random() * 10000)
-                if (!nfcManager.startShare(ip, port, rand)) {
-                    // 错误由 errorOccurred 信号处理
-                    return
-                }
-                nfcStatusText = "正在配对，请将两部手机背部靠近..."
-                return   // 不关闭对话框，等待配对成功
-            }
-            // IP 模式
+            // ===== NFC 模式已注释 =====
+            // if (connectionMethod === "nfc") {
+            //     var ip = nfcManager.getLocalIp()
+            //     if (ip === "") {
+            //         nfcErrorDialog.text = "无法获取本机 IP，请检查网络连接"
+            //         nfcErrorDialog.open()
+            //         return
+            //     }
+            //     var rand = Math.floor(Math.random() * 10000)
+            //     if (!nfcManager.startShare(ip, port, rand)) {
+            //         return
+            //     }
+            //     nfcStatusText = "正在配对，请将两部手机背部靠近..."
+            //     return
+            // }
+            // IP 模式（默认）
             if (isHost) game.startHost(port)
             else game.connectToServer(serverIp, port)
             lanGameStart()
             close()
         }
 
-        // 取消操作（停止 NFC）
+        // 取消操作（NFC 停止已注释）
         onRejected: {
-            if (connectionMethod === "nfc") {
-                nfcManager.stop()
-            }
+            // if (connectionMethod === "nfc") {
+            //     nfcManager.stop()
+            // }
             close()
         }
 
@@ -76,23 +76,26 @@ Rectangle {
             anchors.fill: parent
             spacing: 10
 
+            // ===== 连接方式选择（NFC 按钮已注释） =====
             RowLayout {
                 spacing: 20
                 Layout.alignment: Qt.AlignHCenter
                 RadioButton {
                     text: "IP连接"
                     checked: true
-                    onCheckedChanged: { if (checked) lanDialog.connectionMethod = "ip" }
+                    // 无需切换 connectionMethod，因为 NFC 已禁用
                 }
-                RadioButton {
-                    text: "NFC连接"
-                    onCheckedChanged: { if (checked) lanDialog.connectionMethod = "nfc" }
-                }
+                // RadioButton {
+                //     text: "NFC连接"
+                //     onCheckedChanged: { if (checked) lanDialog.connectionMethod = "nfc" }
+                // }
             }
 
+            // IP 连接设置区域
             ColumnLayout {
                 spacing: 10
-                visible: lanDialog.connectionMethod === "ip"
+                // visible: lanDialog.connectionMethod === "ip"  // 始终可见
+                visible: true
 
                 RowLayout {
                     RadioButton {
@@ -125,16 +128,16 @@ Rectangle {
                 }
             }
 
-            // NFC 显示区域
-            ColumnLayout {
-                visible: lanDialog.connectionMethod === "nfc"
-                Label {
-                    text: lanDialog.nfcStatusText !== "" ? lanDialog.nfcStatusText : "点击确定开始配对"
-                    color: lanDialog.nfcStatusText.startsWith("正在") ? "green" : "gray"
-                    font.italic: true
-                    Layout.alignment: Qt.AlignHCenter
-                }
-            }
+            // ===== NFC 显示区域（已注释） =====
+            // ColumnLayout {
+            //     visible: lanDialog.connectionMethod === "nfc"
+            //     Label {
+            //         text: lanDialog.nfcStatusText !== "" ? lanDialog.nfcStatusText : "点击确定开始配对"
+            //         color: lanDialog.nfcStatusText.startsWith("正在") ? "green" : "gray"
+            //         font.italic: true
+            //         Layout.alignment: Qt.AlignHCenter
+            //     }
+            // }
 
             RowLayout {
                 spacing: 20
@@ -152,7 +155,7 @@ Rectangle {
         }
     }
 
-    // NFC 提示对话框--空壳
+    // ==================== NFC 提示对话框（保留，但未使用） ====================
     Dialog {
         id: nfcHintDialog
         modal: true
@@ -174,7 +177,7 @@ Rectangle {
         onAccepted: close()
     }
 
-    // 以下为原有界面元素
+    // ==================== 主菜单界面 ====================
     Text {
         id: title
         text: "五子棋"
@@ -188,6 +191,7 @@ Rectangle {
     }
 
     Text {
+        id: title1
         text: "Gomoku · 五子连珠"
         font.pixelSize: 18
         font.italic: true
@@ -196,6 +200,28 @@ Rectangle {
         anchors.top: title.bottom
         anchors.topMargin: 12
     }
+
+    // ===== 如果之前有用户名输入框，确保 dbManager 存在或加判断 =====
+    // TextField {
+    //     id: nameInput
+    //     anchors.top: title1.bottom
+    //     anchors.topMargin: 12
+    //     anchors.horizontalCenter: parent.horizontalCenter
+    //     width: 200
+    //     text: (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : ""
+    //     color: "white"
+    //     font.pixelSize: 16
+    //     placeholderText: "输入你的名字"
+    //     background: Rectangle {
+    //         color: "rgba(255,255,255,0.1)"
+    //         border.color: "#aaa"
+    //         border.width: 1
+    //         radius: 6
+    //     }
+    //     onEditingFinished: {
+    //         if (typeof dbManager !== 'undefined' && dbManager) dbManager.setUserName(text)
+    //     }
+    // }
 
     Column {
         anchors.centerIn: parent
@@ -209,7 +235,12 @@ Rectangle {
             font.pixelSize: 20
             font.bold: true
             background: Rectangle {
-                color: btn.down ? "#1f2a4e" : (btn.hovered ? "#696969" : "#a9a9a9")
+                // 修复 color 属性，改用函数形式避免解析歧义
+                color: {
+                    if (btn.down) return "#1f2a4e"
+                    if (btn.hovered) return "#696969"
+                    return "#a9a9a9"
+                }
                 radius: 30
                 border.color: "#708090"
                 border.width: 2
@@ -265,11 +296,11 @@ Rectangle {
                     width: aiCombo.width
                     contentItem: Text {
                         text: modelData
-                        color:"#000000"
+                        color: "#000000"
                         font.pixelSize: 14
                     }
                     background: Rectangle {
-                        color: delegate.hovered? "#708090" : "#a9a9a9"
+                        color: delegate.hovered ? "#708090" : "#a9a9a9"
                         Behavior on color { ColorAnimation { duration: 60 } }
                     }
                 }
