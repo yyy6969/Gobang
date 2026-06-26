@@ -73,6 +73,7 @@ bool DatabaseManager::createTables()
 // ---------- 用户名字 ----------
 bool DatabaseManager::setUserName(const QString &name)
 {
+    qDebug() << "setUserName called with:" << name;
     QSqlQuery query(m_db);
     query.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('user_name', :name)");
     query.bindValue(":name", name);
@@ -85,6 +86,7 @@ bool DatabaseManager::setUserName(const QString &name)
 
 QString DatabaseManager::getUserName() const
 {
+    qDebug() << "getUserName called";
     QSqlQuery query(m_db);
     query.prepare("SELECT value FROM settings WHERE key = 'user_name'");
     if (query.exec() && query.next()) {

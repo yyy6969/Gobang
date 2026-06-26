@@ -797,7 +797,7 @@
                     {
                         "isClass": false,
                         "isFlag": false,
-                        "lineNumber": 30,
+                        "lineNumber": 31,
                         "name": "GameMode",
                         "values": [
                             "LocalMode",
@@ -809,7 +809,7 @@
                     {
                         "isClass": false,
                         "isFlag": false,
-                        "lineNumber": 34,
+                        "lineNumber": 35,
                         "name": "AIDifficulty",
                         "values": [
                             "Easy",
@@ -834,7 +834,7 @@
                         ],
                         "index": 14,
                         "isConst": true,
-                        "lineNumber": 44,
+                        "lineNumber": 45,
                         "name": "pieceAt",
                         "returnType": "int"
                     },
@@ -851,14 +851,14 @@
                             }
                         ],
                         "index": 15,
-                        "lineNumber": 46,
+                        "lineNumber": 47,
                         "name": "placePiece",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
                         "index": 16,
-                        "lineNumber": 48,
+                        "lineNumber": 49,
                         "name": "startGame",
                         "returnType": "void"
                     },
@@ -871,7 +871,7 @@
                             }
                         ],
                         "index": 17,
-                        "lineNumber": 50,
+                        "lineNumber": 51,
                         "name": "setGameMode",
                         "returnType": "void"
                     },
@@ -884,7 +884,7 @@
                             }
                         ],
                         "index": 18,
-                        "lineNumber": 52,
+                        "lineNumber": 53,
                         "name": "setAIDifficulty",
                         "returnType": "void"
                     },
@@ -897,7 +897,7 @@
                             }
                         ],
                         "index": 19,
-                        "lineNumber": 56,
+                        "lineNumber": 57,
                         "name": "startHost",
                         "returnType": "bool"
                     },
@@ -914,21 +914,21 @@
                             }
                         ],
                         "index": 20,
-                        "lineNumber": 58,
+                        "lineNumber": 59,
                         "name": "connectToServer",
                         "returnType": "bool"
                     },
                     {
                         "access": "public",
                         "index": 21,
-                        "lineNumber": 60,
+                        "lineNumber": 61,
                         "name": "cancelNetwork",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
                         "index": 22,
-                        "lineNumber": 62,
+                        "lineNumber": 63,
                         "name": "requestRestart",
                         "returnType": "void"
                     },
@@ -941,14 +941,14 @@
                             }
                         ],
                         "index": 23,
-                        "lineNumber": 66,
+                        "lineNumber": 67,
                         "name": "sendChat",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
                         "index": 24,
-                        "lineNumber": 68,
+                        "lineNumber": 69,
                         "name": "giveUp",
                         "returnType": "void"
                     }
@@ -1073,6 +1073,23 @@
                         "type": "QString",
                         "user": false,
                         "virtual": false
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": false,
+                        "index": 7,
+                        "lineNumber": 28,
+                        "name": "movesCount",
+                        "notify": "gameStateChanged",
+                        "override": false,
+                        "read": "movesCount",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "int",
+                        "user": false,
+                        "virtual": false
                     }
                 ],
                 "qualifiedClassName": "GameController",
@@ -1080,7 +1097,7 @@
                     {
                         "access": "public",
                         "index": 0,
-                        "lineNumber": 81,
+                        "lineNumber": 82,
                         "name": "gameStateChanged",
                         "returnType": "void"
                     },
@@ -1101,21 +1118,21 @@
                             }
                         ],
                         "index": 1,
-                        "lineNumber": 83,
+                        "lineNumber": 84,
                         "name": "boardChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
                         "index": 2,
-                        "lineNumber": 85,
+                        "lineNumber": 86,
                         "name": "networkStatusChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
                         "index": 3,
-                        "lineNumber": 87,
+                        "lineNumber": 88,
                         "name": "chatHistoryChanged",
                         "returnType": "void"
                     }
@@ -1124,14 +1141,14 @@
                     {
                         "access": "private",
                         "index": 4,
-                        "lineNumber": 91,
+                        "lineNumber": 92,
                         "name": "onEngineTurnChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
                         "index": 5,
-                        "lineNumber": 93,
+                        "lineNumber": 94,
                         "name": "onEngineGameOverChanged",
                         "returnType": "void"
                     },
@@ -1152,28 +1169,28 @@
                             }
                         ],
                         "index": 6,
-                        "lineNumber": 95,
+                        "lineNumber": 96,
                         "name": "onEngineBoardChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
                         "index": 7,
-                        "lineNumber": 97,
+                        "lineNumber": 98,
                         "name": "onEngineTimeChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
                         "index": 8,
-                        "lineNumber": 101,
+                        "lineNumber": 102,
                         "name": "onPeerConnected",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
                         "index": 9,
-                        "lineNumber": 103,
+                        "lineNumber": 104,
                         "name": "onPeerDisconnected",
                         "returnType": "void"
                     },
@@ -1190,7 +1207,7 @@
                             }
                         ],
                         "index": 10,
-                        "lineNumber": 105,
+                        "lineNumber": 106,
                         "name": "onPeerMove",
                         "returnType": "void"
                     },
@@ -1207,21 +1224,21 @@
                             }
                         ],
                         "index": 11,
-                        "lineNumber": 107,
+                        "lineNumber": 108,
                         "name": "onPeerChat",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
                         "index": 12,
-                        "lineNumber": 109,
+                        "lineNumber": 110,
                         "name": "onPeerGiveUp",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
                         "index": 13,
-                        "lineNumber": 111,
+                        "lineNumber": 112,
                         "name": "onPeerRestart",
                         "returnType": "void"
                     }

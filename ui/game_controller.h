@@ -24,7 +24,8 @@ class GameController : public QObject
     Q_PROPERTY(QString networkStatus READ networkStatus NOTIFY networkStatusChanged)
     // 暴露给 QML 的属性：聊天历史记录
     Q_PROPERTY(QString chatHistory READ chatHistory NOTIFY chatHistoryChanged)
-
+    // 暴露的游戏步数
+    Q_PROPERTY(int movesCount READ movesCount NOTIFY gameStateChanged)
 public:
     // 游戏模式枚举：本地、AI、网络主机、网络客户端
     enum GameMode { LocalMode, AIMode, NetworkHostMode, NetworkClientMode };
@@ -75,7 +76,7 @@ public:
     int whiteTime() const;       // 获取白方剩余秒数
     QString networkStatus() const { return m_networkStatus; }  // 获取网络状态字符串
     QString chatHistory() const { return m_chatHistory; }      // 获取聊天记录
-
+    int movesCount() const { return m_movesCount; } //访问游戏步数
 signals:
     // 当游戏状态（回合、胜负、时间）变化时发射，QML 中绑定更新界面
     void gameStateChanged();
@@ -127,6 +128,8 @@ private:
     bool m_processingRemote;
     // 聊天记录缓存
     QString m_chatHistory;
+    //记录的游戏步数
+    int m_movesCount = 0;
 
     // ----- 私有辅助函数 -----
     // 设置网络状态字符串并发射信号

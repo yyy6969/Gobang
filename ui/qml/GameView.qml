@@ -33,7 +33,7 @@ Rectangle {
         opacity: 0.5
     }
 
-    // ==================== 顶部栏（两行） ====================
+    //顶部栏
     Rectangle {
         id: topBar
         anchors.top: parent.top
@@ -124,7 +124,7 @@ Rectangle {
                     }
                 }
 
-                // 模式标签（紧邻时间胶囊右侧）
+                // 模式标签
                 Rectangle {
                     height: 22
                     width: 50
@@ -144,7 +144,7 @@ Rectangle {
             }
         }
     }
-    // ==================== 棋盘区域 ====================
+    // 棋盘区域
     Item {
         id: boardContainer
         x: 0
@@ -350,7 +350,7 @@ Rectangle {
         }
     }
 
-    // ==================== 底部栏 ====================
+    // 底部栏
     Rectangle {
         id: bottomBar
         anchors.bottom: parent.bottom
@@ -385,7 +385,7 @@ Rectangle {
         }
     }
 
-    // ==================== 聊天面板（局域网，底部滑出） ====================
+    //聊天面板（局域网，底部滑出）
     Rectangle {
         id: chatPanel
         anchors.bottom: parent.bottom
@@ -436,7 +436,7 @@ Rectangle {
         }
     }
 
-    // ==================== 认输确认对话框 ====================
+    // 认输确认对话框
     Rectangle {
         id: confirmDialog
         anchors.fill: parent
@@ -483,7 +483,7 @@ Rectangle {
         }
     }
 
-    // ==================== 游戏结束遮罩 ====================
+    // 游戏结束遮罩
     Rectangle {
         visible: game.gameOver
         anchors.fill: parent
@@ -536,7 +536,7 @@ Rectangle {
         }
     }
 
-    // ==================== 辅助函数 ====================
+    //辅助函数
     function formatTime(sec) {
         if (sec === undefined) return "0:00"
         var m = Math.floor(sec/60)
@@ -560,5 +560,65 @@ Rectangle {
         else if (gameMode === "ai") game.setGameMode(1)
         game.startGame()
         boardCanvas.requestPaint()
+    }
+
+    //监听棋盘方便输入数据库
+    Connections {
+        target: game
+        onGameOverChanged: {
+            if (game.gameOver) {
+                // 获取玩家名字
+                var playerName = (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : "玩家"
+                if (playerName === "") playerName = "玩家"
+
+                // 确定对手名字
+                var opponentName = ""
+                if (gameMode === "local") opponentName = "本地对手"
+                else if (gameMode === "ai") opponentName = "AI"
+                else if (gameMode === "lan") opponentName = "网络对手"
+
+                // 确定胜者
+                var winner = "draw"
+                if (game.winnerText) {
+                    var wt = game.winnerText
+                    if (wt.includes("黑") || wt.includes("黑棋")) {
+                        // 如果当前模式是 AI 且玩家执黑，则玩家胜；否则对手胜
+                        // 简单处理：如果是 AI 模式，玩家总是黑棋（因为黑先），所以黑胜=玩家胜
+                        // 但其他模式可能不同，这里为了通用，我们直接保存 "黑胜" 或 "白胜" 更清晰
+                        // 但数据库期望 "player"/"opponent"/"draw"，我们转化为相对胜者
+                        // 我们假设在 AI 模式中玩家执黑，本地模式中可能有黑有白，我们更细致处理
+                        if (gameMode === "ai") {
+                            winner = "player"   // AI 模式黑棋是玩家
+                        } else if (gameMode === "local") {
+                            // 本地模式没有明确的玩家/对手，我们存为 "黑胜"
+                            winner = "黑胜"
+                        } else if (gameMode === "lan") {
+                            // 局域网模式，根据 isHost 判断：host 执黑
+                            // 但 game 对象没有 isHost，我们可以从网络状态推断，或直接存 "黑胜"
+                            winner = "黑胜"
+                        }
+                    } else if (wt.includes("白") || wt.includes("白棋")) {
+                        if (gameMode === "ai") {
+                            winner = "opponent"   // AI 模式白棋是 AI
+                        } else if (gameMode === "local") {
+                            winner = "白胜"
+                        } else if (gameMode === "lan") {
+                            winner = "白胜"
+                        }
+                    } else if (wt.includes("平") || wt.includes("和")) {
+                        winner = "draw"
+                    }
+                }
+
+                // 步数
+                var moves = game.movesCount ? game.movesCount : 0
+
+                // 保存记录
+                if (typeof dbManager !== 'undefined' && dbManager) {
+                    var success = dbManager.saveGameRecord(playerName, opponentName, winner, moves)
+                    console.log("保存记录结果:", success)
+                }
+            }
+        }
     }
 }

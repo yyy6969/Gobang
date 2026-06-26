@@ -33,6 +33,10 @@ ApplicationWindow {
             onLanGameStart: {
                 stackView.push(gamePage, { gameMode: "lan" })
             }
+
+            onHistoryRequest: {
+                stackView.push(historyPage)
+            }
         }
     }
 
@@ -42,6 +46,15 @@ ApplicationWindow {
             gameMode: typeof gameMode !== "undefined" ? gameMode : "local"
             onBackToMenu: {
                 game.cancelNetwork()
+                stackView.pop()
+            }
+        }
+    }
+
+    Component {
+        id: historyPage
+        HistoryView {
+            onBackToMenu: {
                 stackView.pop()
             }
         }

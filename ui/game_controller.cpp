@@ -56,6 +56,7 @@ void GameController::placePiece(int row, int col)
     if (!canPlace) return;
 
     m_engine.placePiece(row, col);
+    m_movesCount++;
 
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
         if (m_peer) m_peer->sendMove(row, col);
@@ -65,6 +66,7 @@ void GameController::placePiece(int row, int col)
 void GameController::startGame()
 {
     m_engine.startGame();
+    m_movesCount = 0;   // 重置步数
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
         setNetworkStatus("游戏中");
     }
@@ -280,6 +282,7 @@ void GameController::applyRemoteMove(int row, int col)
 
     m_processingRemote = true;
     m_engine.placePiece(row, col);
+    m_movesCount++;
     m_processingRemote = false;
     // 发出 boardChanged 信号-----通知更新期盼
 }
@@ -301,6 +304,7 @@ void GameController::aiMove()
     }
     if (move.first != -1 && move.second != -1) {
         m_engine.placePiece(move.first, move.second);
+        m_movesCount++;
     }
     aiBusy = false;
 }

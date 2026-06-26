@@ -13,6 +13,13 @@ Rectangle {
     signal localGame()
     signal aiGame(int difficulty)
     signal lanGameStart()
+    signal historyRequest()
+
+    //测试代码
+    Component.onCompleted: {
+        console.log("dbManager exists?", typeof dbManager !== 'undefined')
+        if (dbManager) console.log("getUserName returns:", dbManager.getUserName())
+    }
 
     Image {
         id: background
@@ -22,7 +29,7 @@ Rectangle {
         opacity: 0.7
     }
 
-    // ==================== 局域网连接对话框 ====================
+    //局域网连接对话框
     Dialog {
         id: lanDialog
         modal: true
@@ -76,7 +83,7 @@ Rectangle {
             anchors.fill: parent
             spacing: 10
 
-            // ===== 连接方式选择（NFC 按钮已注释） =====
+            //连接方式选择（NFC 按钮已注释
             RowLayout {
                 spacing: 20
                 Layout.alignment: Qt.AlignHCenter
@@ -128,7 +135,7 @@ Rectangle {
                 }
             }
 
-            // ===== NFC 显示区域（已注释） =====
+            //NFC 显示区域（已注释
             // ColumnLayout {
             //     visible: lanDialog.connectionMethod === "nfc"
             //     Label {
@@ -155,7 +162,7 @@ Rectangle {
         }
     }
 
-    // ==================== NFC 提示对话框（保留，但未使用） ====================
+    //  NFC 提示对话框（保留，但未使用）
     Dialog {
         id: nfcHintDialog
         modal: true
@@ -177,7 +184,7 @@ Rectangle {
         onAccepted: close()
     }
 
-    // ==================== 主菜单界面 ====================
+    //主菜单界面
     Text {
         id: title
         text: "五子棋"
@@ -201,27 +208,52 @@ Rectangle {
         anchors.topMargin: 12
     }
 
-    // ===== 如果之前有用户名输入框，确保 dbManager 存在或加判断 =====
-    // TextField {
-    //     id: nameInput
-    //     anchors.top: title1.bottom
-    //     anchors.topMargin: 12
-    //     anchors.horizontalCenter: parent.horizontalCenter
-    //     width: 200
-    //     text: (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : ""
-    //     color: "white"
-    //     font.pixelSize: 16
-    //     placeholderText: "输入你的名字"
-    //     background: Rectangle {
-    //         color: "rgba(255,255,255,0.1)"
-    //         border.color: "#aaa"
-    //         border.width: 1
-    //         radius: 6
-    //     }
-    //     onEditingFinished: {
-    //         if (typeof dbManager !== 'undefined' && dbManager) dbManager.setUserName(text)
-    //     }
-    // }
+    //用户名输入和状态反馈
+    Column {
+        id: nameColumn
+        anchors.top: title1.bottom
+        anchors.topMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+        spacing: 4
+
+        TextField {
+            id: nameInput
+            width: 200
+            text: (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : ""
+            placeholderText: "输入你的名字"
+            color: "white"
+            font.pixelSize: 16
+            background: Rectangle {
+                color: Qt.rgba(255, 255, 255, 0.1)
+                border.color: "#aaa"
+                border.width: 1
+                radius: 6
+            }
+            onEditingFinished: {
+                if (typeof dbManager !== 'undefined' && dbManager) {
+                    var success = dbManager.setUserName(text)
+                    if (success) {
+                        saveStatus.text = "✅ 已保存"
+                        saveStatus.color = "lightgreen"
+                    } else {
+                        saveStatus.text = "❌ 保存失败，请检查日志"
+                        saveStatus.color = "red"
+                    }
+                    console.log("用户名已保存:", text)
+                } else {
+                    saveStatus.text = "❌ dbManager 未就绪"
+                    saveStatus.color = "red"
+                }
+            }
+        }
+
+        Text {
+            id: saveStatus
+            font.pixelSize: 12
+            color: "lightgreen"
+            text: ""   // 初始为空
+        }
+    }
 
     Column {
         anchors.centerIn: parent
@@ -311,7 +343,14 @@ Rectangle {
             text: "🌐 局域网对战"
             onClicked: lanDialog.open()
         }
+
+        GameButton {
+            text: "📜 对战记录"
+            onClicked: historyRequest()
+        }
     }
+
+
 
     Text {
         text: "v2.0 · 支持局域网对战 & 三档AI"

@@ -26,6 +26,7 @@ qt_add_executable(Gonbal_My_Game
     documents/Statues.png
     documents/uml.png
     core/databasemanager.h core/databasemanager.cpp
+
 )
 
 set_target_properties(Gonbal_My_Game PROPERTIES
@@ -50,6 +51,7 @@ qt6_add_resources(Gonbal_My_Game "qml_resources"
         ui/qml/main.qml
         ui/qml/MainMenu.qml
         ui/qml/GameView.qml
+        ui/qml/HistoryView.qml
         image/background.jpg
         image/background2.jpg
         image/background3.jpg
