@@ -70,7 +70,7 @@ bool DatabaseManager::createTables()
     return true;
 }
 
-// ---------- 用户名字 ----------
+//用户名字
 bool DatabaseManager::setUserName(const QString &name)
 {
     qDebug() << "setUserName called with:" << name;
@@ -95,12 +95,33 @@ QString DatabaseManager::getUserName() const
     return QString(); // 返回空表示未设置
 }
 
-// ---------- 保存记录 ----------
+// 保存记录
+
 bool DatabaseManager::saveGameRecord(const QString &playerName,
                                      const QString &opponentName,
                                      const QString &winner,
                                      int movesCount)
 {
+    // 防重：使用静态变量缓存最近一次保存的玩家对和时间戳
+    static QString lastPlayer;
+    static QString lastOpponent;
+    static qint64 lastTimestamp = 0; // 秒级时间戳
+
+    qint64 now = QDateTime::currentSecsSinceEpoch();
+
+    // 如果 10 秒内相同玩家对，直接跳过（防止重复插入）
+    if (lastPlayer == playerName && lastOpponent == opponentName &&
+        (now - lastTimestamp) < 10) {
+        qDebug() << "Duplicate record ignored (same players within 10s)";
+        return true; // 不插入，但返回成功
+    }
+
+    // 更新缓存
+    lastPlayer = playerName;
+    lastOpponent = opponentName;
+    lastTimestamp = now;
+
+    // 执行插入
     QSqlQuery query(m_db);
     query.prepare(R"(
         INSERT INTO game_records (player_name, opponent_name, winner, moves_count)
@@ -118,7 +139,7 @@ bool DatabaseManager::saveGameRecord(const QString &playerName,
     return true;
 }
 
-// ---------- 查询所有记录 ----------
+// 查询所有记录
 QVariantList DatabaseManager::getAllRecords() const
 {
     QVariantList records;
@@ -133,13 +154,15 @@ QVariantList DatabaseManager::getAllRecords() const
         map["opponentName"] = query.value("opponent_name").toString();
         map["winner"] = query.value("winner").toString();
         map["movesCount"] = query.value("moves_count").toInt();
-        map["gameTime"] = query.value("game_time").toDateTime().toString("yyyy-MM-dd hh:mm:ss");
+        QDateTime dt = query.value("game_time").toDateTime();
+        dt = dt.toLocalTime();   // UTC → 本地时间
+        map["gameTime"] = dt.toString("yyyy-MM-dd hh:mm:ss");
         records.append(map);
     }
     return records;
 }
 
-// ---------- 清空记录（可选） ----------
+// 清空记录(后续实现)
 bool DatabaseManager::clearAllRecords()
 {
     QSqlQuery query(m_db);
