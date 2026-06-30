@@ -10,20 +10,25 @@ Rectangle {
     signal backToMenu()
 
     // 尺寸属性
-    property int topBarHeight: 54
+    property int topBarHeight: 40
     property int bottomBarHeight: 40
-    property int chatBarHeight: (gameMode === "lan" && game.networkStatus !== "") ? 50 : 0
+    property int chatBarHeight: 0
+    property bool chatExpanded: false   // 聊天面板展开/收起
 
     property int cellSize: {
-        var w = parent.width - 20
-        var h = parent.height - topBarHeight - bottomBarHeight - chatBarHeight - 20
+        var w = root.width - 20
+        var h = root.height - topBarHeight - bottomBarHeight - 20
         var maxCell = Math.min((w - 40) / 14, (h - 40) / 14)
-        return Math.max(20, maxCell)
+        var size = maxCell * 1.08//调整棋子大小
+        return Math.max(20, size)
     }
 
     property int boardPixels: 14 * cellSize
     property int boardX: (parent.width - boardPixels) / 2
-    property int boardY: (topBarHeight + (parent.height - topBarHeight - bottomBarHeight - chatBarHeight - boardPixels) / 2)
+    property int boardY: {
+        var availHeight = root.height - topBarHeight - bottomBarHeight
+        return topBarHeight + (availHeight - boardPixels) / 2
+    }
 
     // 背景
     Image {
@@ -150,7 +155,7 @@ Rectangle {
         x: 0
         y: topBarHeight
         width: parent.width
-        height: parent.height - topBarHeight - bottomBarHeight - chatBarHeight
+        height: parent.height - topBarHeight - bottomBarHeight
 
         // 棋盘底板
         Rectangle {
@@ -385,55 +390,143 @@ Rectangle {
         }
     }
 
-    //聊天面板（局域网，底部滑出）
+    // 聊天面板(聊天时展开)
     Rectangle {
         id: chatPanel
-        anchors.bottom: parent.bottom
+        anchors.bottom: bottomBar.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: chatBarHeight
-        visible: gameMode === "lan"
-        color: "#2c3e50"
-        z: 20
+        height: chatExpanded ? 350 : 0
+        visible: gameMode === "lan" && game.networkStatus !== "" && chatExpanded
+        color: "#ffffff"
+        clip: true
+        z: 30
+        radius: 12
 
-        Row {
+        Behavior on height {
+            NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+        }
+
+        Column {
             anchors.fill: parent
-            anchors.margins: 4
-            spacing: 4
+            anchors.margins: 8
+            spacing: 8
+
+            // 消息显示区域
             ScrollView {
-                width: parent.width - 120
-                height: parent.height
-                ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+                width: parent.width
+                height: parent.height - 50
                 TextArea {
                     id: chatDisplay
+                    width: parent.width
                     readOnly: true
                     wrapMode: TextArea.Wrap
-                    color: "#ecf0f1"
-                    font.pixelSize: 12
-                    background: Rectangle { color: "#34495e"; radius: 4 }
+                    color: "#2c3e50"
+                    font.pixelSize: 14
+                    font.family: "Microsoft YaHei"
+                    background: Rectangle {
+                        color: "#f5f5f5"
+                        radius: 8
+                        border.color: "#ddd"
+                        border.width: 1
+                    }
                     text: game.chatHistory
+                    onTextChanged: {
+                        chatDisplay.cursorPosition = chatDisplay.length
+                    }
                 }
             }
-            TextField {
-                id: chatInput
-                width: 60
-                height: parent.height
-                placeholderText: "消息"
-                color: "white"
-                font.pixelSize: 12
-                background: Rectangle { color: "#34495e"; radius: 4 }
-                onAccepted: sendChat()
-            }
-            Button {
-                text: "发送"
-                font.pixelSize: 12
-                width: 45
-                height: parent.height
-                background: Rectangle { color: "#2ecc71"; radius: 4 }
-                contentItem: Text { text: "发送"; color: "white"; font: parent.font }
-                onClicked: sendChat()
+
+            // 输入行
+            Row {
+                width: parent.width
+                height: 40
+                spacing: 8
+
+                TextField {
+                    id: chatInput
+                    width: parent.width - 70
+                    height: parent.height
+                    placeholderText: "输入消息..."
+                    color: "#2c3e50"
+                    font.pixelSize: 14
+                    background: Rectangle {
+                        color: "#f5f5f5"
+                        radius: 8
+                        border.color: "#ddd"
+                        border.width: 1
+                    }
+                    onAccepted: sendChat()
+                }
+                Button {
+                    text: "发送"
+                    font.pixelSize: 14
+                    width: 60
+                    height: parent.height
+                    background: Rectangle {
+                        color: "#2ecc71"
+                        radius: 8
+                    }
+                    contentItem: Text {
+                        text: "发送"
+                        color: "white"
+                        font: parent.font
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: sendChat()
+                }
             }
         }
+
+        // 关闭按钮
+        Button {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 8
+            width: 30
+            height: 30
+            visible: chatExpanded
+            background: Rectangle {
+                color: "#e74c3c"
+                radius: 15
+            }
+            contentItem: Item {
+                anchors.fill: parent
+                Text {
+                    text: "✕"
+                    color: "white"
+                    font.pixelSize: 18
+                    font.bold: true
+                    anchors.centerIn: parent
+                }
+            }
+            onClicked: chatExpanded = false
+        }
+    }
+
+
+    // 独立聊天展开按钮
+    Button {
+        id: toggleChatBtn
+        anchors.right: parent.right
+        anchors.bottom: bottomBar.top
+        anchors.margins: 6
+        width: 40
+        height: 40
+        visible: gameMode === "lan" && game.networkStatus !== "" && !chatExpanded
+        background: Rectangle {
+            color: "#3498db"
+            radius: 20
+        }
+        contentItem: Text {
+            text: "💬"
+            color: "white"
+            font.pixelSize: 20
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+        onClicked: chatExpanded = true
     }
 
     // 认输确认对话框
