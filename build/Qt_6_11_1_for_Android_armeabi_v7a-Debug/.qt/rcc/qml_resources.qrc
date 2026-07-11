@@ -1,12 +1,14 @@
 <RCC>
   <qresource prefix="/">
-    <file alias="ui/qml/main.qml">/myWork/train/Gobang/ui/qml/main.qml</file>
-    <file alias="ui/qml/MainMenu.qml">/myWork/train/Gobang/ui/qml/MainMenu.qml</file>
-    <file alias="ui/qml/GameView.qml">/myWork/train/Gobang/ui/qml/GameView.qml</file>
-    <file alias="image/background.jpg">/myWork/train/Gobang/image/background.jpg</file>
-    <file alias="image/background2.jpg">/myWork/train/Gobang/image/background2.jpg</file>
-    <file alias="image/background3.jpg">/myWork/train/Gobang/image/background3.jpg</file>
-    <file alias="image/background4.jpg">/myWork/train/Gobang/image/background4.jpg</file>
+    <file alias="ui/qml/main.qml">/gobang/Gobang/ui/qml/main.qml</file>
+    <file alias="ui/qml/MainMenu.qml">/gobang/Gobang/ui/qml/MainMenu.qml</file>
+    <file alias="ui/qml/GameView.qml">/gobang/Gobang/ui/qml/GameView.qml</file>
+    <file alias="ui/qml/HistoryView.qml">/gobang/Gobang/ui/qml/HistoryView.qml</file>
+    <file alias="ui/qml/BoardInputHandler.qml">/gobang/Gobang/ui/qml/BoardInputHandler.qml</file>
+    <file alias="image/background.jpg">/gobang/Gobang/image/background.jpg</file>
+    <file alias="image/background2.jpg">/gobang/Gobang/image/background2.jpg</file>
+    <file alias="image/background3.jpg">/gobang/Gobang/image/background3.jpg</file>
+    <file alias="image/background4.jpg">/gobang/Gobang/image/background4.jpg</file>
   </qresource>
 </RCC>
 

@@ -6,20 +6,22 @@ Rectangle {
     id: root
     color: "#2c3e50"
 
-    property string gameMode: "local"
+    //外部可传入的属性
+    property string gameMode: "local"      // local / ai / lan
+    property bool isHost: true             // 联网模式下是否为主机（执黑）
     signal backToMenu()
 
-    // 尺寸属性
+    //尺寸属性
     property int topBarHeight: 40
     property int bottomBarHeight: 40
     property int chatBarHeight: 0
-    property bool chatExpanded: false   // 聊天面板展开/收起
+    property bool chatExpanded: false
 
     property int cellSize: {
         var w = root.width - 20
         var h = root.height - topBarHeight - bottomBarHeight - 20
         var maxCell = Math.min((w - 40) / 14, (h - 40) / 14)
-        var size = maxCell * 1.08//调整棋子大小
+        var size = maxCell * 1.08
         return Math.max(20, size)
     }
 
@@ -30,7 +32,7 @@ Rectangle {
         return topBarHeight + (availHeight - boardPixels) / 2
     }
 
-    // 背景
+    // 背景图片
     Image {
         anchors.fill: parent
         source: "qrc:/image/background2.jpg"
@@ -53,7 +55,6 @@ Rectangle {
             anchors.margins: 4
             spacing: 2
 
-            // 第一行：返回、认输（左对齐）
             RowLayout {
                 width: parent.width
                 height: 28
@@ -99,20 +100,16 @@ Rectangle {
                     onClicked: confirmDialog.visible = true
                 }
 
-                // 占位，让按钮靠左
                 Item { Layout.fillWidth: true }
             }
 
-            // 第二行：时间胶囊居中，模式标签在其右侧（整体居中）
             RowLayout {
                 width: parent.width
                 height: 24
                 spacing: 6
 
-                // 左侧占位
                 Item { Layout.fillWidth: true }
 
-                // 时间胶囊
                 Rectangle {
                     height: 22
                     implicitWidth: Math.min(parent.width - 100, 200)
@@ -129,7 +126,6 @@ Rectangle {
                     }
                 }
 
-                // 模式标签
                 Rectangle {
                     height: 22
                     width: 50
@@ -144,12 +140,12 @@ Rectangle {
                     }
                 }
 
-                // 右侧占位
                 Item { Layout.fillWidth: true }
             }
         }
     }
-    // 棋盘区域
+
+    //棋盘区域
     Item {
         id: boardContainer
         x: 0
@@ -157,7 +153,7 @@ Rectangle {
         width: parent.width
         height: parent.height - topBarHeight - bottomBarHeight
 
-        // 棋盘底板
+        // 棋盘底板阴影
         Rectangle {
             x: root.boardX - 2
             y: root.boardY - 2
@@ -177,20 +173,7 @@ Rectangle {
             border.width: 1
         }
 
-        // 预览棋子
-        Rectangle {
-            id: preview
-            width: root.cellSize * 0.8
-            height: width
-            radius: width/2
-            opacity: 0.6
-            visible: false
-            border.width: 1
-            border.color: "gold"
-            z: 6
-        }
-
-        // Canvas 绘制
+        //Canvas 绘制棋盘和棋子
         Canvas {
             id: boardCanvas
             x: root.boardX - root.cellSize/2
@@ -211,7 +194,7 @@ Rectangle {
                 var half = cell / 2
                 var maxPix = (boardSize - 1) * cell
 
-                // 网格
+                // 网格线
                 ctx.strokeStyle = "#4a2e1e"
                 ctx.lineWidth = 1
                 for (var i = 0; i < boardSize; i++) {
@@ -303,59 +286,38 @@ Rectangle {
             }
         }
 
-        // 鼠标/触摸交互
-        Item {
-            id: inputArea
-            x: root.boardX - root.cellSize/2
-            y: root.boardY - root.cellSize/2
-            width: root.boardPixels + root.cellSize
-            height: root.boardPixels + root.cellSize
-            z: 6
+        //新的高级交互处理器
+        BoardInputHandler {
+            id: inputHandler
+            cellSize: root.cellSize
+            boardX: root.boardX
+            boardY: root.boardY
+            gameController: game
 
-            HoverHandler {
-                id: hoverHandler
-                enabled: !game.gameOver
-                onPointChanged: {
-                    if (point.position.x < 0 || point.position.y < 0) {
-                        preview.visible = false
-                        return
-                    }
-                    var localX = point.position.x - root.cellSize / 2
-                    var localY = point.position.y - root.cellSize / 2
-                    var col = Math.round(localX / root.cellSize)
-                    var row = Math.round(localY / root.cellSize)
-                    if (row >= 0 && row < 15 && col >= 0 && col < 15 && game.pieceAt(row, col) === 0) {
-                        preview.x = root.boardX + col * root.cellSize - preview.width/2
-                        preview.y = root.boardY + row * root.cellSize - preview.height/2
-                        preview.color = game.currentPlayer === 0 ? "#2c2c2c" : "#f8f9fa"
-                        preview.visible = true
-                    } else {
-                        preview.visible = false
-                    }
+            // 根据游戏模式和角色计算是否轮到我
+            myTurn: {
+                if (gameMode === "local") return true
+                if (gameMode === "ai") return game.currentPlayer === 0
+                if (gameMode === "lan") {
+                    return (isHost && game.currentPlayer === 0) || (!isHost && game.currentPlayer === 1)
                 }
-                onHoveredChanged: { if (!hovered) preview.visible = false }
+                return true
             }
 
-            TapHandler {
-                enabled: !game.gameOver
-                acceptedButtons: Qt.LeftButton
-                onTapped: {
-                    var localX = point.position.x - root.cellSize / 2
-                    var localY = point.position.y - root.cellSize / 2
-                    var col = Math.round(localX / root.cellSize)
-                    var row = Math.round(localY / root.cellSize)
-                    if (row >= 0 && row < 15 && col >= 0 && col < 15 && game.pieceAt(row, col) === 0) {
-                        boardCanvas.lastRow = row
-                        boardCanvas.lastCol = col
-                        game.placePiece(row, col)
-                        boardCanvas.requestPaint()
-                    }
-                }
+            showScore: true        // 显示 AI 评分（仅在 AI 或本地模式下有意义）
+            showForbidden: false   // 暂不开启禁手
+
+            // 用户点击落子时执行
+            onPlaceRequested: {
+                boardCanvas.lastRow = row
+                boardCanvas.lastCol = col
+                game.placePiece(row, col)
+                boardCanvas.requestPaint()
             }
         }
     }
 
-    // 底部栏
+    //底部栏
     Rectangle {
         id: bottomBar
         anchors.bottom: parent.bottom
@@ -390,7 +352,7 @@ Rectangle {
         }
     }
 
-    // 聊天面板(聊天时展开)
+    //聊天面板
     Rectangle {
         id: chatPanel
         anchors.bottom: bottomBar.top
@@ -412,7 +374,6 @@ Rectangle {
             anchors.margins: 8
             spacing: 8
 
-            // 消息显示区域
             ScrollView {
                 width: parent.width
                 height: parent.height - 50
@@ -437,7 +398,6 @@ Rectangle {
                 }
             }
 
-            // 输入行
             Row {
                 width: parent.width
                 height: 40
@@ -479,7 +439,6 @@ Rectangle {
             }
         }
 
-        // 关闭按钮
         Button {
             anchors.right: parent.right
             anchors.top: parent.top
@@ -505,8 +464,7 @@ Rectangle {
         }
     }
 
-
-    // 独立聊天展开按钮
+    //聊天展开按钮
     Button {
         id: toggleChatBtn
         anchors.right: parent.right
@@ -529,7 +487,7 @@ Rectangle {
         onClicked: chatExpanded = true
     }
 
-    // 认输确认对话框
+    //认输确认对话框
     Rectangle {
         id: confirmDialog
         anchors.fill: parent
@@ -576,7 +534,7 @@ Rectangle {
         }
     }
 
-    // 游戏结束遮罩
+    //游戏结束遮罩
     Rectangle {
         visible: game.gameOver
         anchors.fill: parent
@@ -655,47 +613,32 @@ Rectangle {
         boardCanvas.requestPaint()
     }
 
-    //监听棋盘方便输入数据库
+    //自动保存游戏记录
     Connections {
         target: game
         onGameOverChanged: {
             if (game.gameOver) {
-                // 获取玩家名字
                 var playerName = (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : "玩家"
                 if (playerName === "") playerName = "玩家"
 
-                // 确定对手名字
                 var opponentName = ""
                 if (gameMode === "local") opponentName = "本地对手"
                 else if (gameMode === "ai") opponentName = "AI"
                 else if (gameMode === "lan") opponentName = "网络对手"
 
-                // 确定胜者
                 var winner = "draw"
                 if (game.winnerText) {
                     var wt = game.winnerText
                     if (wt.includes("黑") || wt.includes("黑棋")) {
-                        // 如果当前模式是 AI 且玩家执黑，则玩家胜；否则对手胜
-                        // 简单处理：如果是 AI 模式，玩家总是黑棋（因为黑先），所以黑胜=玩家胜
-                        // 但其他模式可能不同，这里为了通用，我们直接保存 "黑胜" 或 "白胜" 更清晰
-                        // 但数据库期望 "player"/"opponent"/"draw"，我们转化为相对胜者
-                        // 我们假设在 AI 模式中玩家执黑，本地模式中可能有黑有白，我们更细致处理
                         if (gameMode === "ai") {
-                            winner = "player"   // AI 模式黑棋是玩家
-                        } else if (gameMode === "local") {
-                            // 本地模式没有明确的玩家/对手，我们存为 "黑胜"
-                            winner = "黑胜"
-                        } else if (gameMode === "lan") {
-                            // 局域网模式，根据 isHost 判断：host 执黑
-                            // 但 game 对象没有 isHost，我们可以从网络状态推断，或直接存 "黑胜"
+                            winner = "player"
+                        } else {
                             winner = "黑胜"
                         }
                     } else if (wt.includes("白") || wt.includes("白棋")) {
                         if (gameMode === "ai") {
-                            winner = "opponent"   // AI 模式白棋是 AI
-                        } else if (gameMode === "local") {
-                            winner = "白胜"
-                        } else if (gameMode === "lan") {
+                            winner = "opponent"
+                        } else {
                             winner = "白胜"
                         }
                     } else if (wt.includes("平") || wt.includes("和")) {
@@ -703,10 +646,7 @@ Rectangle {
                     }
                 }
 
-                // 步数
                 var moves = game.movesCount ? game.movesCount : 0
-
-                // 保存记录
                 if (typeof dbManager !== 'undefined' && dbManager) {
                     var success = dbManager.saveGameRecord(playerName, opponentName, winner, moves)
                     console.log("保存记录结果:", success)

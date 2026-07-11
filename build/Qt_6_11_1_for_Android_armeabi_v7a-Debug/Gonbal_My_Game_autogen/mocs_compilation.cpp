@@ -5,4 +5,5 @@
 #include "PCISOZVL4B/moc_game_client.cpp"
 #include "PCISOZVL4B/moc_game_server.cpp"
 #include "PCISOZVL4B/moc_network_player.cpp"
+#include "PCISOZVL4B/moc_nfcmanager.cpp"
 #include "UYX5XTB5RZ/moc_game_controller.cpp"
