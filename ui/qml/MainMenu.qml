@@ -1,5 +1,5 @@
 // File: MainMenu.qml
-// 游戏主页组件优化版
+// 游戏主页组件（优化版。设置 + 左上角名字 + 难度对话框）
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
@@ -12,11 +12,27 @@ Rectangle {
     color: "#1a1a2e"
 
     signal localGame()
-    signal aiGame(int difficulty)
+    signal aiGame(int difficulty)      // 0=简单, 1=一般, 2=困难
     signal lanGameStart()
     signal historyRequest()
 
-    // 设置
+    //玩家名字（左上角）
+    property string userName: (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : ""
+
+    Text {
+        id: nameDisplay
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.margins: 20
+        text: userName !== "" ? "👤 " + userName : "👤 未命名"
+        font.pixelSize: 18
+        font.bold: true
+        color: "#e0e0e0"
+        visible: true
+        z: 10
+    }
+
+    //设置对话框
     Dialog {
         id: settingsDialog
         modal: true
@@ -28,7 +44,6 @@ Rectangle {
         focus: true
         standardButtons: Dialog.Ok | Dialog.Cancel
 
-        // 名字输入
         Column {
             anchors.fill: parent
             anchors.margins: 20
@@ -44,7 +59,7 @@ Rectangle {
                 id: settingNameInput
                 width: parent.width
                 placeholderText: "输入你的名字"
-                text: (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : ""
+                text: userName
                 font.pixelSize: 14
                 color: "#2c3e50"
                 background: Rectangle {
@@ -55,7 +70,6 @@ Rectangle {
                 }
             }
 
-            // 保存状态提示
             Text {
                 id: settingSaveStatus
                 text: ""
@@ -91,6 +105,8 @@ Rectangle {
                                 settingSaveStatus.text = "✅ 已保存"
                                 settingSaveStatus.color = "lightgreen"
                                 settingSaveStatus.visible = true
+                                // 更新左上角名字
+                                userName = settingNameInput.text
                             } else {
                                 settingSaveStatus.text = "❌ 保存失败"
                                 settingSaveStatus.color = "red"
@@ -124,9 +140,9 @@ Rectangle {
         }
 
         onAccepted: {
-            // 点击确定时保存
             if (typeof dbManager !== 'undefined' && dbManager) {
                 dbManager.setUserName(settingNameInput.text)
+                userName = settingNameInput.text
             }
             settingsDialog.close()
         }
@@ -135,6 +151,92 @@ Rectangle {
         }
     }
 
+    //人机对战难度选择对话框
+    Dialog {
+        id: aiDifficultyDialog
+        modal: true
+        title: "选择难度"
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        width: 360
+        height: 280
+        focus: true
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        property int selectedDifficulty: 1   // 默认一般
+
+        Column {
+            anchors.fill: parent
+            anchors.margins: 30
+            spacing: 25
+
+            Label {
+                text: "请选择难度，越往右越难"
+                font.pixelSize: 20
+                font.bold: true
+                color: "#2c3e50"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Column {
+                spacing: 20
+                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                // 滑动条
+                Slider {
+                    id: difficultySlider
+                    from: 0
+                    to: 2
+                    stepSize: 1
+                    value: 1
+                    width: parent.width
+                    onValueChanged: {
+                        // 更新显示文字
+                        difficultyLabel.text = difficultyText(value)
+                    }
+                }
+
+                // 显示当前难度文字
+                Label {
+                    id: difficultyLabel
+                    text: difficultyText(difficultySlider.value)
+                    font.pixelSize: 22
+                    font.bold: true
+                    color: "#2980b9"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // 刻度标记
+                Row {
+                    width: difficultySlider.width
+                    spacing: (width - 40) / 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Text { text: "简单"; font.pixelSize: 14; color: "#7f8c8d" }
+                    Text { text: "一般"; font.pixelSize: 14; color: "#7f8c8d" }
+                    Text { text: "困难"; font.pixelSize: 14; color: "#7f8c8d" }
+                }
+            }
+        }
+
+        //辅助函数：根据数值返回文字
+        function difficultyText(val) {
+            if (val < 0.5) return "简单"
+            if (val < 1.5) return "一般"
+            return "困难"
+        }
+
+        onAccepted: {
+            //传递选中难度（四舍五入）
+            selectedDifficulty = Math.round(difficultySlider.value)
+            aiGame(selectedDifficulty)
+            close()
+        }
+        onRejected: {
+            close()
+        }
+    }
     //背景
     Image {
         id: background
@@ -208,48 +310,7 @@ Rectangle {
         GameButton {
             id: aiButton
             text: "🤖 人机对战"
-            onClicked: aiGame(aiCombo.currentIndex)
-        }
-
-        RowLayout {
-            spacing: 10
-            Layout.alignment: Qt.AlignHCenter
-            Label {
-                text: "难度："
-                color: "#e0e0e0"
-                font.pixelSize: 16
-            }
-            ComboBox {
-                id: aiCombo
-                model: ["简单", "一般", "困难"]
-                currentIndex: 1
-                font.pixelSize: 14
-                implicitWidth: 100
-                background: Rectangle {
-                    color: "#a9a9a9"
-                    radius: 6
-                }
-                contentItem: Text {
-                    text: aiCombo.displayText
-                    color: "white"
-                    font.pixelSize: 14
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                delegate: ItemDelegate {
-                    id: delegate
-                    width: aiCombo.width
-                    contentItem: Text {
-                        text: modelData
-                        color: "#000000"
-                        font.pixelSize: 14
-                    }
-                    background: Rectangle {
-                        color: delegate.hovered ? "#708090" : "#a9a9a9"
-                        Behavior on color { ColorAnimation { duration: 60 } }
-                    }
-                }
-            }
+            onClicked: aiDifficultyDialog.open()
         }
 
         GameButton {
@@ -263,17 +324,20 @@ Rectangle {
         }
     }
 
-    // 右上角设置图标
+    //右上角显眼设置图标
     Button {
         id: settingsButton
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 20
-        width: 48
-        height: 48
+        width: 56
+        height: 56
         background: Rectangle {
-            color: parent.hovered ? "#696969" : "transparent"
-            radius: 24
+            color: parent.hovered ? "#7f8c8d" : "#a9a9a9"
+            radius: 28
+            border.color: "#ecf0f1"
+            border.width: 2
+            Behavior on color { ColorAnimation { duration: 150 } }
         }
         contentItem: Text {
             text: "⚙️"
@@ -286,7 +350,7 @@ Rectangle {
 
     //底部版本信息
     Text {
-        text: "v2.2 · 支持局域网对战 & 三档AI"
+        text: "v2.3 · 支持局域网对战 & 三档AI"
         font.pixelSize: 12
         color: "#f0ffff"
         anchors.bottom: parent.bottom
@@ -510,13 +574,11 @@ Rectangle {
         }
     }
 
-    //首次启动时自动检测名字
+    //初始化
     Component.onCompleted: {
+        // 刷新名字显示
         if (typeof dbManager !== 'undefined' && dbManager) {
-            var name = dbManager.getUserName()
-            if (name !== "") {
-                console.log("当前玩家:", name)
-            }
+            userName = dbManager.getUserName()
         }
     }
 }
