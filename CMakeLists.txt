@@ -13,11 +13,11 @@ qt_add_executable(Gonbal_My_Game
     WIN32 MACOSX_BUNDLE
     main.cpp
     ui/game_controller.cpp
-    core/ai_player.cpp
+
     core/board.cpp
     core/gomoku_engine.cpp
-    core/human_player.cpp
-    core/timer_manager.cpp
+
+
     nerwork/game_client.cpp
     nerwork/game_server.cpp
     nerwork/network_player.cpp
@@ -26,6 +26,12 @@ qt_add_executable(Gonbal_My_Game
     documents/Statues.png
     documents/uml.png
 
+
+    ui/qml/main.qml
+    ui/qml/MainMenu.qml
+    ui/qml/GameView.qml
+    ui/qml/HistoryView.qml
+    ui/qml/BoardInputHandler.qml
     core/databasemanager.h core/databasemanager.cpp
 
 
@@ -40,12 +46,12 @@ set_target_properties(Gonbal_My_Game PROPERTIES
 
 target_sources(Gonbal_My_Game PRIVATE
     ui/game_controller.h
-    core/ai_player.h
+
     core/board.h
     core/gomoku_engine.h
-    core/human_player.h
-    core/player.h
-    core/timer_manager.h
+
+
+
     nerwork/game_client.h
     nerwork/game_server.h
     nerwork/network_player.h
