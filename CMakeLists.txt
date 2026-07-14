@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.19)
 project(Gonbal_My_Game)
 
 set(ANDROID_MIN_SDK_VERSION 21)
-set(ANDROID_TARGET_SDK_VERSION 34)   # 或 33、35
-find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2 Network  Nfc  Sql)
+set(ANDROID_TARGET_SDK_VERSION 34)
+
+find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2 Network Nfc Sql)
 
 qt_standard_project_setup()
 
@@ -11,95 +12,77 @@ if(ANDROID)
     set(QT_ANDROID_ABIS arm64-v8a armeabi-v7a)
 endif()
 
-qt_add_executable(Gonbal_My_Game
-    WIN32 MACOSX_BUNDLE
-    main.cpp
-    ui/game_controller.cpp
-
-    core/board.cpp
-    core/gomoku_engine.cpp
-
-
-    nerwork/game_client.cpp
-    nerwork/game_server.cpp
-    nerwork/network_player.cpp
-
-    documents/skloten_project.txt
-    documents/Statues.png
-    documents/uml.png
-
-
-    ui/qml/main.qml
-    ui/qml/MainMenu.qml
-    ui/qml/GameView.qml
-    ui/qml/HistoryView.qml
-    ui/qml/BoardInputHandler.qml
-    core/databasemanager.h core/databasemanager.cpp
-
-
-    nerwork/nfc_peer.h nerwork/nfc_peer.cpp
-    android/src/com/Gonbal_My_Game/NfcReaderHelper.java
-
-
-
-)
-
-set_target_properties(Gonbal_My_Game PROPERTIES
-   QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-
-target_sources(Gonbal_My_Game PRIVATE
-    ui/game_controller.h
-
-    core/board.h
-    core/gomoku_engine.h
-
-
-
-    nerwork/game_client.h
-    nerwork/game_server.h
-    nerwork/network_player.h
-)
-
-qt6_add_resources(Gonbal_My_Game "qml_resources"
-    PREFIX "/"
-    FILES
+#1. QML 模块（自动处理 QML_ELEMENT 注册)
+qt6_add_qml_module(Gonbal_My_Game
+    URI com.yourcompany.gobang
+    VERSION 1.0
+    QML_FILES
         ui/qml/main.qml
         ui/qml/MainMenu.qml
         ui/qml/GameView.qml
         ui/qml/HistoryView.qml
         ui/qml/BoardInputHandler.qml
+    SOURCES
+        main.cpp
+        ui/game_controller.cpp
+        core/board.cpp
+        core/gomoku_engine.cpp
+        core/databasemanager.cpp
+        nerwork/game_client.cpp
+        nerwork/game_server.cpp
+        nerwork/network_player.cpp
+        nerwork/nfc_peer.cpp
+        ui/game_controller.h
+        core/board.h
+        core/gomoku_engine.h
+        core/databasemanager.h
+        nerwork/game_client.h
+        nerwork/game_server.h
+        nerwork/network_player.h
+        nerwork/nfc_peer.h
+)
+
+# 2. 图片资源
+qt6_add_resources(Gonbal_My_Game "qml_resources"
+    PREFIX "/"
+    FILES
         image/background.jpg
         image/background2.jpg
         image/background3.jpg
         image/background4.jpg
 )
 
-if(NOT ANDROID)
-    target_link_libraries(Gonbal_My_Game PRIVATE SQLite::SQLite3)
-endif()
+# 3. Android 部署目录
+set_target_properties(Gonbal_My_Game PROPERTIES
+    QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
+)
 
-find_package(Qt6 REQUIRED COMPONENTS Nfc CorePrivate)
+#4. 头文件搜索路径
+target_include_directories(Gonbal_My_Game PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+)
 
-# 关键：指向 android 子目录
-set(QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android)
-
+# 5. 链接库
 target_link_libraries(Gonbal_My_Game PRIVATE
     Qt::Core
     Qt::Qml
     Qt::Quick
     Qt::QuickControls2
     Qt::Network
-    Qt6::Nfc
     Qt::Sql
-    Qt6::CorePrivate
 )
 
-
 if(ANDROID)
-    # 获取构建输出目录（androiddeployqt 的输出路径）
-    set(ANDROID_DEPLOY_DIR "${CMAKE_BINARY_DIR}/android-build")
+    target_link_libraries(Gonbal_My_Game PRIVATE Qt6::Nfc)
+else()
+    target_link_libraries(Gonbal_My_Game PRIVATE SQLite::SQLite3)
+endif()
 
-    # 在构建前，强制复制自定义资源到部署目录
+#6. Android 自定义资源复制
+if(ANDROID)
+    set(ANDROID_DEPLOY_DIR "${CMAKE_BINARY_DIR}/android-build")
     add_custom_command(TARGET Gonbal_My_Game PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "Copying custom Android resources..."
         COMMAND ${CMAKE_COMMAND} -E copy_directory

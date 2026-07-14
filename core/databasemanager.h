@@ -7,10 +7,13 @@
 #include <QSqlQuery>
 #include <QVariantList>
 #include <QDateTime>
+#include <QtQml>
 
 class DatabaseManager: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+
 public:
     DatabaseManager(QObject *parent = nullptr);
     ~DatabaseManager();

@@ -4,6 +4,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import com.yourcompany.gobang 1.0
 
 Rectangle {
     id: menuRoot
@@ -18,6 +19,10 @@ Rectangle {
 
     //玩家名字（左上角）
     property string userName: (typeof dbManager !== 'undefined' && dbManager) ? dbManager.getUserName() : ""
+
+    // 新增属性（接收父级传入）
+    property var game
+    property var dbManager
 
     Text {
         id: nameDisplay

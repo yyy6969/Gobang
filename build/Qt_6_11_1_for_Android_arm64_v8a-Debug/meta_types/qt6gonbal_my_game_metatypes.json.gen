@@ -381,6 +381,156 @@
     {
         "classes": [
             {
+                "className": "NfcPeer",
+                "lineNumber": 40,
+                "object": true,
+                "qualifiedClassName": "NfcPeer",
+                "signals": [
+                    {
+                        "access": "public",
+                        "index": 0,
+                        "lineNumber": 76,
+                        "name": "connected",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "index": 1,
+                        "lineNumber": 79,
+                        "name": "disconnected",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "row",
+                                "type": "int"
+                            },
+                            {
+                                "name": "col",
+                                "type": "int"
+                            }
+                        ],
+                        "index": 2,
+                        "lineNumber": 82,
+                        "name": "moveReceived",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "name",
+                                "type": "QString"
+                            },
+                            {
+                                "name": "msg",
+                                "type": "QString"
+                            }
+                        ],
+                        "index": 3,
+                        "lineNumber": 85,
+                        "name": "chatReceived",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "index": 4,
+                        "lineNumber": 88,
+                        "name": "giveUpReceived",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "winner",
+                                "type": "QString"
+                            }
+                        ],
+                        "index": 5,
+                        "lineNumber": 91,
+                        "name": "gameOverReceived",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "index": 6,
+                        "lineNumber": 94,
+                        "name": "restartReceived",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "message",
+                                "type": "QString"
+                            }
+                        ],
+                        "index": 7,
+                        "lineNumber": 97,
+                        "name": "errorOccurred",
+                        "returnType": "void"
+                    }
+                ],
+                "slots": [
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "data",
+                                "type": "QByteArray"
+                            }
+                        ],
+                        "index": 8,
+                        "lineNumber": 101,
+                        "name": "onNdefDataReceived",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "index": 9,
+                        "lineNumber": 104,
+                        "name": "onNfcConnected",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "index": 10,
+                        "lineNumber": 107,
+                        "name": "onNfcDisconnected",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "message",
+                                "type": "QString"
+                            }
+                        ],
+                        "index": 11,
+                        "lineNumber": 110,
+                        "name": "onNfcError",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "nfc_peer.h",
+        "outputRevision": 69
+    },
+    {
+        "classes": [
+            {
                 "className": "Board",
                 "enums": [
                     {
@@ -489,8 +639,14 @@
     {
         "classes": [
             {
+                "classInfos": [
+                    {
+                        "name": "QML.Element",
+                        "value": "auto"
+                    }
+                ],
                 "className": "DatabaseManager",
-                "lineNumber": 11,
+                "lineNumber": 12,
                 "methods": [
                     {
                         "access": "public",
@@ -501,7 +657,7 @@
                             }
                         ],
                         "index": 0,
-                        "lineNumber": 20,
+                        "lineNumber": 23,
                         "name": "setUserName",
                         "returnType": "bool"
                     },
@@ -509,7 +665,7 @@
                         "access": "public",
                         "index": 1,
                         "isConst": true,
-                        "lineNumber": 21,
+                        "lineNumber": 24,
                         "name": "getUserName",
                         "returnType": "QString"
                     },
@@ -534,7 +690,7 @@
                             }
                         ],
                         "index": 2,
-                        "lineNumber": 23,
+                        "lineNumber": 26,
                         "name": "saveGameRecord",
                         "returnType": "bool"
                     },
@@ -542,14 +698,14 @@
                         "access": "public",
                         "index": 3,
                         "isConst": true,
-                        "lineNumber": 28,
+                        "lineNumber": 31,
                         "name": "getAllRecords",
                         "returnType": "QVariantList"
                     },
                     {
                         "access": "public",
                         "index": 4,
-                        "lineNumber": 30,
+                        "lineNumber": 33,
                         "name": "clearAllRecords",
                         "returnType": "bool"
                     }
@@ -792,24 +948,18 @@
     {
         "classes": [
             {
+                "classInfos": [
+                    {
+                        "name": "QML.Element",
+                        "value": "auto"
+                    }
+                ],
                 "className": "GameController",
                 "enums": [
                     {
                         "isClass": false,
                         "isFlag": false,
-                        "lineNumber": 31,
-                        "name": "GameMode",
-                        "values": [
-                            "LocalMode",
-                            "AIMode",
-                            "NetworkHostMode",
-                            "NetworkClientMode"
-                        ]
-                    },
-                    {
-                        "isClass": false,
-                        "isFlag": false,
-                        "lineNumber": 35,
+                        "lineNumber": 61,
                         "name": "AIDifficulty",
                         "values": [
                             "Easy",
@@ -818,8 +968,38 @@
                         ]
                     }
                 ],
-                "lineNumber": 9,
+                "lineNumber": 14,
                 "methods": [
+                    {
+                        "access": "public",
+                        "index": 22,
+                        "isConst": true,
+                        "lineNumber": 47,
+                        "name": "getLocalIp",
+                        "returnType": "QString"
+                    },
+                    {
+                        "access": "public",
+                        "index": 23,
+                        "isConst": true,
+                        "lineNumber": 50,
+                        "name": "isHost",
+                        "returnType": "bool"
+                    },
+                    {
+                        "access": "public",
+                        "index": 24,
+                        "lineNumber": 52,
+                        "name": "startNfcHost",
+                        "returnType": "bool"
+                    },
+                    {
+                        "access": "public",
+                        "index": 25,
+                        "lineNumber": 53,
+                        "name": "connectNfcClient",
+                        "returnType": "bool"
+                    },
                     {
                         "access": "public",
                         "arguments": [
@@ -832,9 +1012,9 @@
                                 "type": "int"
                             }
                         ],
-                        "index": 14,
+                        "index": 26,
                         "isConst": true,
-                        "lineNumber": 45,
+                        "lineNumber": 71,
                         "name": "pieceAt",
                         "returnType": "int"
                     },
@@ -850,15 +1030,15 @@
                                 "type": "int"
                             }
                         ],
-                        "index": 15,
-                        "lineNumber": 47,
+                        "index": 27,
+                        "lineNumber": 73,
                         "name": "placePiece",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
-                        "index": 16,
-                        "lineNumber": 49,
+                        "index": 28,
+                        "lineNumber": 75,
                         "name": "startGame",
                         "returnType": "void"
                     },
@@ -870,8 +1050,8 @@
                                 "type": "int"
                             }
                         ],
-                        "index": 17,
-                        "lineNumber": 51,
+                        "index": 29,
+                        "lineNumber": 77,
                         "name": "setGameMode",
                         "returnType": "void"
                     },
@@ -883,8 +1063,8 @@
                                 "type": "int"
                             }
                         ],
-                        "index": 18,
-                        "lineNumber": 53,
+                        "index": 30,
+                        "lineNumber": 79,
                         "name": "setAIDifficulty",
                         "returnType": "void"
                     },
@@ -896,8 +1076,8 @@
                                 "type": "quint16"
                             }
                         ],
-                        "index": 19,
-                        "lineNumber": 57,
+                        "index": 31,
+                        "lineNumber": 83,
                         "name": "startHost",
                         "returnType": "bool"
                     },
@@ -913,22 +1093,22 @@
                                 "type": "quint16"
                             }
                         ],
-                        "index": 20,
-                        "lineNumber": 59,
+                        "index": 32,
+                        "lineNumber": 85,
                         "name": "connectToServer",
                         "returnType": "bool"
                     },
                     {
                         "access": "public",
-                        "index": 21,
-                        "lineNumber": 61,
+                        "index": 33,
+                        "lineNumber": 87,
                         "name": "cancelNetwork",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
-                        "index": 22,
-                        "lineNumber": 63,
+                        "index": 34,
+                        "lineNumber": 89,
                         "name": "requestRestart",
                         "returnType": "void"
                     },
@@ -940,15 +1120,15 @@
                                 "type": "QString"
                             }
                         ],
-                        "index": 23,
-                        "lineNumber": 67,
+                        "index": 35,
+                        "lineNumber": 93,
                         "name": "sendChat",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
-                        "index": 24,
-                        "lineNumber": 69,
+                        "index": 36,
+                        "lineNumber": 95,
                         "name": "giveUp",
                         "returnType": "void"
                     }
@@ -960,7 +1140,7 @@
                         "designable": true,
                         "final": false,
                         "index": 0,
-                        "lineNumber": 14,
+                        "lineNumber": 20,
                         "name": "currentPlayer",
                         "notify": "gameStateChanged",
                         "override": false,
@@ -977,7 +1157,7 @@
                         "designable": true,
                         "final": false,
                         "index": 1,
-                        "lineNumber": 16,
+                        "lineNumber": 22,
                         "name": "gameOver",
                         "notify": "gameStateChanged",
                         "override": false,
@@ -994,7 +1174,7 @@
                         "designable": true,
                         "final": false,
                         "index": 2,
-                        "lineNumber": 18,
+                        "lineNumber": 24,
                         "name": "winnerText",
                         "notify": "gameStateChanged",
                         "override": false,
@@ -1011,7 +1191,7 @@
                         "designable": true,
                         "final": false,
                         "index": 3,
-                        "lineNumber": 20,
+                        "lineNumber": 26,
                         "name": "blackTime",
                         "notify": "gameStateChanged",
                         "override": false,
@@ -1028,7 +1208,7 @@
                         "designable": true,
                         "final": false,
                         "index": 4,
-                        "lineNumber": 22,
+                        "lineNumber": 28,
                         "name": "whiteTime",
                         "notify": "gameStateChanged",
                         "override": false,
@@ -1045,7 +1225,7 @@
                         "designable": true,
                         "final": false,
                         "index": 5,
-                        "lineNumber": 24,
+                        "lineNumber": 30,
                         "name": "networkStatus",
                         "notify": "networkStatusChanged",
                         "override": false,
@@ -1062,7 +1242,7 @@
                         "designable": true,
                         "final": false,
                         "index": 6,
-                        "lineNumber": 26,
+                        "lineNumber": 32,
                         "name": "chatHistory",
                         "notify": "chatHistoryChanged",
                         "override": false,
@@ -1079,7 +1259,7 @@
                         "designable": true,
                         "final": false,
                         "index": 7,
-                        "lineNumber": 28,
+                        "lineNumber": 34,
                         "name": "movesCount",
                         "notify": "gameStateChanged",
                         "override": false,
@@ -1097,7 +1277,7 @@
                     {
                         "access": "public",
                         "index": 0,
-                        "lineNumber": 82,
+                        "lineNumber": 108,
                         "name": "gameStateChanged",
                         "returnType": "void"
                     },
@@ -1118,37 +1298,44 @@
                             }
                         ],
                         "index": 1,
-                        "lineNumber": 84,
+                        "lineNumber": 110,
                         "name": "boardChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
                         "index": 2,
-                        "lineNumber": 86,
+                        "lineNumber": 112,
                         "name": "networkStatusChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "public",
                         "index": 3,
-                        "lineNumber": 88,
+                        "lineNumber": 114,
                         "name": "chatHistoryChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "index": 4,
+                        "lineNumber": 118,
+                        "name": "lanGameStart",
                         "returnType": "void"
                     }
                 ],
                 "slots": [
                     {
                         "access": "private",
-                        "index": 4,
-                        "lineNumber": 92,
+                        "index": 5,
+                        "lineNumber": 122,
                         "name": "onEngineTurnChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
-                        "index": 5,
-                        "lineNumber": 94,
+                        "index": 6,
+                        "lineNumber": 124,
                         "name": "onEngineGameOverChanged",
                         "returnType": "void"
                     },
@@ -1168,29 +1355,29 @@
                                 "type": "int"
                             }
                         ],
-                        "index": 6,
-                        "lineNumber": 96,
+                        "index": 7,
+                        "lineNumber": 126,
                         "name": "onEngineBoardChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
-                        "index": 7,
-                        "lineNumber": 98,
+                        "index": 8,
+                        "lineNumber": 128,
                         "name": "onEngineTimeChanged",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
-                        "index": 8,
-                        "lineNumber": 102,
+                        "index": 9,
+                        "lineNumber": 132,
                         "name": "onPeerConnected",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
-                        "index": 9,
-                        "lineNumber": 104,
+                        "index": 10,
+                        "lineNumber": 134,
                         "name": "onPeerDisconnected",
                         "returnType": "void"
                     },
@@ -1206,8 +1393,8 @@
                                 "type": "int"
                             }
                         ],
-                        "index": 10,
-                        "lineNumber": 106,
+                        "index": 11,
+                        "lineNumber": 136,
                         "name": "onPeerMove",
                         "returnType": "void"
                     },
@@ -1223,23 +1410,98 @@
                                 "type": "QString"
                             }
                         ],
-                        "index": 11,
-                        "lineNumber": 108,
+                        "index": 12,
+                        "lineNumber": 138,
                         "name": "onPeerChat",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
-                        "index": 12,
-                        "lineNumber": 110,
+                        "index": 13,
+                        "lineNumber": 140,
                         "name": "onPeerGiveUp",
                         "returnType": "void"
                     },
                     {
                         "access": "private",
-                        "index": 13,
-                        "lineNumber": 112,
+                        "index": 14,
+                        "lineNumber": 142,
                         "name": "onPeerRestart",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "index": 15,
+                        "lineNumber": 152,
+                        "name": "onNfcConnected",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "index": 16,
+                        "lineNumber": 153,
+                        "name": "onNfcDisconnected",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "arguments": [
+                            {
+                                "name": "row",
+                                "type": "int"
+                            },
+                            {
+                                "name": "col",
+                                "type": "int"
+                            }
+                        ],
+                        "index": 17,
+                        "lineNumber": 154,
+                        "name": "onNfcMove",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "arguments": [
+                            {
+                                "name": "name",
+                                "type": "QString"
+                            },
+                            {
+                                "name": "msg",
+                                "type": "QString"
+                            }
+                        ],
+                        "index": 18,
+                        "lineNumber": 155,
+                        "name": "onNfcChat",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "index": 19,
+                        "lineNumber": 156,
+                        "name": "onNfcGiveUp",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "index": 20,
+                        "lineNumber": 157,
+                        "name": "onNfcRestart",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "arguments": [
+                            {
+                                "name": "msg",
+                                "type": "QString"
+                            }
+                        ],
+                        "index": 21,
+                        "lineNumber": 158,
+                        "name": "onNfcError",
                         "returnType": "void"
                     }
                 ],

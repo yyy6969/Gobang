@@ -1,6 +1,6 @@
 #ifndef GAME_CONTROLLER_H
 #define GAME_CONTROLLER_H
-
+#include <QtQml>
 #include <QObject>
 #include "../core/gomoku_engine.h"
 #include"../nerwork/nfc_peer.h"
@@ -13,10 +13,8 @@ class NetworkPeer;
 
 class GameController : public QObject
 {
-    Q_OBJECT   // 启用 Qt 元对象特性，支持信号槽和属性系统
-
-
-
+    Q_OBJECT
+    QML_ELEMENT
 
     // 暴露给 QML 的属性：当前轮到谁（0黑1白）
     Q_PROPERTY(int currentPlayer READ currentPlayer NOTIFY gameStateChanged)

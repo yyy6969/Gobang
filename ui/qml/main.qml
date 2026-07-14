@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import com.yourcompany.gobang 1.0
 
 ApplicationWindow {
     id: root
@@ -12,6 +13,15 @@ ApplicationWindow {
     maximumHeight: height
     title: "五子棋"
 
+
+    // 创建实例，id 命名为 game 和 dbManager
+    GameController {
+        id: game
+    }
+    DatabaseManager {
+        id: dbManager
+    }
+
     StackView {
         id: stackView
         anchors.fill: parent
@@ -21,6 +31,9 @@ ApplicationWindow {
     Component {
         id: mainMenuPage
         MainMenu {
+            GameController: game
+            dbManager: dbManager
+
             onLocalGame: {
                 game.setGameMode(0)
                 stackView.push(gamePage, { gameMode: "local", isHost: true })
@@ -42,6 +55,9 @@ ApplicationWindow {
     Component {
         id: gamePage
         GameView {
+            property var gameController: null
+            property var dbManager: null
+
             gameMode: typeof gameMode !== "undefined" ? gameMode : "local"
             onBackToMenu: {
                 game.cancelNetwork()

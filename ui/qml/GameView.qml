@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import com.yourcompany.gobang 1.0
 
 Rectangle {
     id: root
@@ -31,6 +32,10 @@ Rectangle {
         var availHeight = root.height - topBarHeight - bottomBarHeight
         return topBarHeight + (availHeight - boardPixels) / 2
     }
+
+    //同样新增
+    property var game
+    property var dbManager
 
     // 背景图片
     Image {
@@ -293,7 +298,6 @@ Rectangle {
             boardX: root.boardX
             boardY: root.boardY
             gameController: game
-
             // 根据游戏模式和角色计算是否轮到我
             myTurn: {
                 if (gameMode === "local") return true

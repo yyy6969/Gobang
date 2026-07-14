@@ -5,6 +5,8 @@ Rectangle {
     id: root
     color: "#1a1a2e"
 
+    property var dbManager
+
     signal backToMenu()
 
     // 背景
@@ -15,7 +17,7 @@ Rectangle {
         opacity: 0.6
     }
 
-    // 标题栏（类似顶部栏）
+    // 标题栏
     Rectangle {
         id: topBar
         anchors.top: parent.top

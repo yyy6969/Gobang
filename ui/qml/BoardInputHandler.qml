@@ -78,7 +78,7 @@ Item {
         }
     }
 
-    //禁手警告（预留）
+    //禁手警告
     Rectangle {
         id: forbiddenIndicator
         visible: false
