@@ -1,8 +1,33 @@
-// Module通过nfc进行连接操作，主机发送字段，副机进行连接
-// File: nfc_peer.h   Version: 0.1.0   License: AGPLv3
+// Module: NFC 对等连接模块,-----------目前开发失败
+// File: nfc_peer.h   Version: 1.0.0   License: AGPLv3
 // Created: 唐晟庆2024051604041   2026-07-14 12:20:10
+// Email: 2052448030@qq.com
 // Description:
+//    通过 NFC 进行设备间局域网连接操作。
+//    主机（服务端）调用 startServer() 进入等待模式，
+//    副机（客户端）调用 connectToTarget() 进行连接。
+//    本模块基于 Android 原生 NFC API（通过 JNI 调用），
+//    使用 enableReaderMode 强制前台应用获得 NFC 数据读取权，
+//    绕过部分厂商（如 OPPO）系统对 NFC 事件的拦截。
 //
+//    1. 主机调用 startServer() → 创建 Java 辅助类 NfcReaderHelper
+//       → 调用 NfcAdapter.enableReaderMode() 进入读卡器模式
+//    2. 副机调用 connectToTarget() → 同样进入读卡器模式
+//    3. 两部手机触碰 → 主机检测到 Tag → 通过 writeNdefMessage 写入握手消息
+//    4. 副机检测到 Tag → 通过 readNdefMessages 读取消息 → 触发连接信号
+//    5. 连接建立后，通过 Qt 信号槽机制通知上层（GameController）
+//
+// 注意：
+//    - 本模块需要 Android 设备支持 NFC 功能
+//    - 需在 AndroidManifest.xml 中声明 NFC 权限
+//    - 当前实现基于 JNI 调用 Android 原生 API，不依赖 Qt NFC 模块
+//
+// 使用示例（在 GameController 中）：
+//    m_nfcPeer = new NfcPeer(this);
+//    connect(m_nfcPeer, &NfcPeer::connected, this, &GameController::onNfcConnected);
+//    m_nfcPeer->startServer();  // 主机模式
+//    // 或
+//    m_nfcPeer->connectToTarget();  // 客户端模式
 
 #ifndef NFC_PEER_H
 #define NFC_PEER_H

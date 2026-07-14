@@ -315,7 +315,7 @@ Rectangle {
 
         GameButton {
             text: "🌐 局域网对战"
-            onClicked: lanDialog.open()
+            onClicked: hotspotHintDialog.open()
         }
 
         GameButton {
@@ -363,6 +363,51 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
+    Dialog {
+        id: hotspotHintDialog
+        modal: true
+        title: "局域网对战准备"
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        width: 360
+        height: 300
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        Column {
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 15
+
+            Label {
+                text: "请确保主机与副机通过热点连接"
+                font.pixelSize: 16
+                font.bold: true
+                wrapMode: Text.WordWrap
+                color: "#2c3e50"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Label {
+                text: "（主机需开启热点，副机连接该热点）"
+                font.pixelSize: 14
+                color: "#7f8c8d"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Item { height: 10 } // 占位
+            Label {
+                text: "点击“确定”后，请确认主机已开启热点\n副机需连接该热点并输入主机IP\n创建房间的先点击确定进入对局\n然后加入房间的再点击确认加入房间"
+                font.pixelSize: 13
+                wrapMode: Text.WordWrap
+                color: "#95a5a6"
+                horizontalAlignment: Text.AlignHCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+
+        onAccepted: {
+            lanDialog.open()
+        }
+    }
+
     //局域网连接对话框
     Dialog {
         id: lanDialog
@@ -389,16 +434,36 @@ Rectangle {
                 Layout.alignment: Qt.AlignHCenter
                 RadioButton {
                     ButtonGroup.group: roleGroup
-                    text: "创建房间"
+                    text: "创建-作为黑棋:⚫"
                     checked: true
                     onCheckedChanged: { if (checked) lanDialog.isHost = true }
                 }
                 RadioButton {
                     ButtonGroup.group: roleGroup
-                    text: "加入房间"
+                    text: "加入-作为白棋:⚪"
                     onCheckedChanged: { if (checked) lanDialog.isHost = false }
                 }
             }
+
+            RowLayout {
+                visible: lanDialog.isHost
+                spacing: 10
+                Label { text: "本机 IP:"; font.bold: true }
+                TextField {
+                    text: {
+                        var ip = game.getLocalIp()
+                        return ip !== "" ? ip : "未获取到 IP，请检查网络"
+                    }
+                    readOnly: true
+                    selectByMouse: true
+                    Layout.fillWidth: true
+                    background: Rectangle {
+                        color: "#f0f0f0"
+                        radius: 4
+                    }
+                }
+            }
+
 
             ColumnLayout {
                 spacing: 10
@@ -428,7 +493,8 @@ Rectangle {
                 Layout.alignment: Qt.AlignRight
                 Button {
                     text: "确定"
-                    onClicked: lanDialog.accept()
+                   onClicked: lanDialog.accept()
+
                 }
                 Button {
                     text: "取消"
@@ -509,6 +575,8 @@ Rectangle {
                     onCheckedChanged: { if (checked) nfcDialog.isHost = false }
                 }
             }
+
+
 
             // 状态显示（直接绑定 game.networkStatus）
             Label {

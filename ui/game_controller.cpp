@@ -5,6 +5,14 @@
 #include <QRandomGenerator>
 #include <QVector>
 #include <QTimer>
+#include <QProcess>
+
+#include <QDebug>
+#include <QProcess>
+#include <QRegularExpression>
+
+#include <QNetworkInterface>
+
 
 static const int DIRS[4][2] = {{0,1}, {1,0}, {1,1}, {1,-1}};
 
@@ -522,4 +530,37 @@ int GameController::evaluatePosition(int row, int col, int pieceColor) const
         else if (count == 1) total += 1;
     }
     return total;
+}
+
+
+QString GameController::getLocalIp() const
+{
+    const QList<QNetworkInterface> &interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface : interfaces) {
+        // 跳过未启用或回环接口
+        if (!(iface.flags() & QNetworkInterface::IsUp) ||
+            (iface.flags() & QNetworkInterface::IsLoopBack))
+            continue;
+
+        // 跳过虚拟网卡（如 Docker、VMware 等）
+        QString name = iface.name().toLower();
+        if (name.startsWith("docker") || name.startsWith("vmnet") || name.startsWith("vboxnet"))
+            continue;
+
+        for (const QNetworkAddressEntry &entry : iface.addressEntries()) {
+            QHostAddress addr = entry.ip();
+            if (addr.protocol() == QAbstractSocket::IPv4Protocol &&
+                !addr.isLoopback() &&
+                !addr.isLinkLocal() &&
+                addr.toString() != "0.0.0.0") {
+                QString ip = addr.toString();
+
+                if (!ip.startsWith("127.")) {
+                    return ip;
+                }
+            }
+        }
+    }
+    // 如果找不到，返回空字符串
+    return QString();
 }

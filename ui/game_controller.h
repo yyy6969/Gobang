@@ -44,6 +44,12 @@ class GameController : public QObject
 
 public:
 
+
+    //get ip
+    Q_INVOKABLE QString getLocalIp() const;
+
+
+    Q_INVOKABLE bool isHost() const { return m_isHost; }
     // 新增 NFC 专用方法
     Q_INVOKABLE bool startNfcHost(); // port 保留但实际NFC不用，可忽略
     Q_INVOKABLE bool connectNfcClient();

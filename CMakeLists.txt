@@ -23,7 +23,7 @@ qt_add_executable(Gonbal_My_Game
     nerwork/game_client.cpp
     nerwork/game_server.cpp
     nerwork/network_player.cpp
-    core/datamanager.cpp
+
     documents/skloten_project.txt
     documents/Statues.png
     documents/uml.png

@@ -40,12 +40,14 @@ bool NetworkPeer::startServer(quint16 port)
 
 bool NetworkPeer::connectToHost(const QString &ip, quint16 port)
 {
+    qDebug() << "[NetworkPeer] connectToHost called" << ip << port;
     if (m_socket) return false;
     m_socket = new QTcpSocket(this);
     connect(m_socket, &QTcpSocket::connected, this, &NetworkPeer::connected);
     connect(m_socket, &QTcpSocket::readyRead, this, &NetworkPeer::onReadyRead);
     connect(m_socket, &QTcpSocket::disconnected, this, &NetworkPeer::onSocketDisconnected);
     m_socket->connectToHost(ip, port);
+    qDebug() << "[NetworkPeer] connectToHost called, waiting for connection";
     m_isServer = false;
     return true;
 }
@@ -68,11 +70,15 @@ void NetworkPeer::disconnect()
 
 void NetworkPeer::sendMessage(const QJsonObject &obj)
 {
-    if (!m_socket || m_socket->state() != QAbstractSocket::ConnectedState)
+    qDebug() << "[NetworkPeer] sendMessage called, socket=" << m_socket
+             << "state=" << (m_socket ? m_socket->state() : -1);
+    if (!m_socket || m_socket->state() != QAbstractSocket::ConnectedState) {
+        qDebug() << "[NetworkPeer] sendMessage failed: socket not connected";
         return;
+    }
     m_socket->write(buildMessage(obj));
+    qDebug() << "[NetworkPeer] Message sent";
 }
-
 void NetworkPeer::sendMove(int row, int col)
 {
     QJsonObject obj;
@@ -109,12 +115,14 @@ void NetworkPeer::sendGameOver(const QString &winner)
 
 void NetworkPeer::onNewConnection()
 {
+    qDebug() << "[NetworkPeer] onNewConnection called";
     if (m_socket) {
-        // 已有客户端，拒绝新连接
+        qDebug() << "[NetworkPeer] Already have a socket, rejecting new connection";
         m_server->nextPendingConnection()->disconnectFromHost();
         return;
     }
     m_socket = m_server->nextPendingConnection();
+    qDebug() << "[NetworkPeer] New socket accepted";
     connect(m_socket, &QTcpSocket::readyRead, this, &NetworkPeer::onReadyRead);
     connect(m_socket, &QTcpSocket::disconnected, this, &NetworkPeer::onSocketDisconnected);
     emit connected();

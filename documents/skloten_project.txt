@@ -154,7 +154,23 @@ GameController::startHost(quint16 port) 和 connectToServer(QString ip, quint16 
 
 
 
-------------------------------
+------------------------------          网络显示ip地址开发问题
+问题描述：
+黑棋（主机）落子后，白棋（客户端）无法落子，双方陷入阻塞。日志显示客户端已进入游戏界面，但 myTurn 始终为 false。
+问题原因：
+GameView.qml 默认 isHost: true，客户端作为白棋实际应为 false，但创建 GameView 时未传入 isHost 值，导致回合判断错误。
 
+解决方案：
+
+    在 game_controller.h 中添加 Q_INVOKABLE bool isHost() const;
+
+    在 main.qml 的 onLanGameStart 中传入 isHost: game.isHost()
+
+
+问题描述：
+局域网对话框中的“本机 IP”字段显示为空或 false。
+
+解决方案：
+放弃 QProcess，改用 QNetworkInterface 遍历网卡获取 IP，只过滤 wlan、eth、ap 开头的物理网卡
 
 

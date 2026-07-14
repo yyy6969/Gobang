@@ -23,15 +23,15 @@ ApplicationWindow {
         MainMenu {
             onLocalGame: {
                 game.setGameMode(0)
-                stackView.push(gamePage, { gameMode: "local" })
+                stackView.push(gamePage, { gameMode: "local", isHost: true })
             }
             onAiGame: function(difficulty) {
                 game.setGameMode(1)
                 game.setAIDifficulty(difficulty)
-                stackView.push(gamePage, { gameMode: "ai" })
+                stackView.push(gamePage, { gameMode: "ai", isHost: true })
             }
             onLanGameStart: {
-                stackView.push(gamePage, { gameMode: "lan" })
+                stackView.push(gamePage, { gameMode: "lan", isHost: game.isHost() })
             }
             onHistoryRequest: {
                 stackView.push(historyPage)
