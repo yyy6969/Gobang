@@ -13,15 +13,53 @@ GameController::GameController(QObject *parent)
     , m_gameMode(LocalMode)
     , m_aiDifficulty(Medium)
     , m_peer(nullptr)
+    , m_nfcPeer(new NfcPeer(this))   // 初始化
     , m_isHost(false)
     , m_processingRemote(false)
+    , m_movesCount(0)
 {
     connect(&m_engine, &GameEngine::turnChanged, this, &GameController::onEngineTurnChanged);
     connect(&m_engine, &GameEngine::gameOverChanged, this, &GameController::onEngineGameOverChanged);
     connect(&m_engine, &GameEngine::boardChanged, this, &GameController::onEngineBoardChanged);
     connect(&m_engine, &GameEngine::blackTimeChanged, this, &GameController::onEngineTimeChanged);
     connect(&m_engine, &GameEngine::whiteTimeChanged, this, &GameController::onEngineTimeChanged);
+
+    // 连接 NFC 信号
+    connect(m_nfcPeer, &NfcPeer::connected, this, &GameController::onNfcConnected);
+    connect(m_nfcPeer, &NfcPeer::disconnected, this, &GameController::onNfcDisconnected);
+    connect(m_nfcPeer, &NfcPeer::moveReceived, this, &GameController::onNfcMove);
+    connect(m_nfcPeer, &NfcPeer::chatReceived, this, &GameController::onNfcChat);
+    connect(m_nfcPeer, &NfcPeer::giveUpReceived, this, &GameController::onNfcGiveUp);
+    connect(m_nfcPeer, &NfcPeer::restartReceived, this, &GameController::onNfcRestart);
+    connect(m_nfcPeer, &NfcPeer::errorOccurred, this, &GameController::onNfcError);
 }
+
+bool GameController::startNfcHost()
+{
+    qDebug() << "[GameController] startNfcHost called";
+    if (m_nfcPeer->startServer()) {
+        m_gameMode = NfcHostMode;
+        m_isHost = true;
+        setNetworkStatus("NFC 主机已启动，请对方靠近");
+        emit gameStateChanged();
+        return true;
+    }
+    return false;
+}
+
+bool GameController::connectNfcClient()
+{
+    qDebug() << "[GameController] connectNfcClient called";
+    if (m_nfcPeer->connectToTarget()) {
+        m_gameMode = NfcClientMode;
+        m_isHost = false;
+        setNetworkStatus("正在等待 NFC 连接...");
+        emit gameStateChanged();
+        return true;
+    }
+    return false;
+}
+
 
 GameController::~GameController()
 {
@@ -51,6 +89,11 @@ void GameController::placePiece(int row, int col)
         bool myTurn = (m_isHost && m_engine.currentPlayer() == 0) ||
                       (!m_isHost && m_engine.currentPlayer() == 1);
         canPlace = myTurn;
+    } else if (m_gameMode == NfcHostMode || m_gameMode == NfcClientMode) {
+        // NFC 模式回合判断与网络模式一致
+        bool myTurn = (m_isHost && m_engine.currentPlayer() == 0) ||
+                      (!m_isHost && m_engine.currentPlayer() == 1);
+        canPlace = myTurn;
     }
 
     if (!canPlace) return;
@@ -58,9 +101,13 @@ void GameController::placePiece(int row, int col)
     m_engine.placePiece(row, col);
     m_movesCount++;
 
+    // 发送给对端（只发送一次）
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
         if (m_peer) m_peer->sendMove(row, col);
+    } else if (m_gameMode == NfcHostMode || m_gameMode == NfcClientMode) {
+        if (m_nfcPeer) m_nfcPeer->sendMove(row, col);
     }
+
 }
 
 void GameController::startGame()
@@ -128,16 +175,59 @@ void GameController::requestRestart()
 {
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
         if (m_peer) m_peer->sendRestart();
-        // 本地立即重置，避免等待对方延迟
-        m_engine.startGame();
-        if (m_isHost)
-            setNetworkStatus("已重新开始，黑棋先走");
-        else
-            setNetworkStatus("已重新开始，您是白棋");
-    } else {
-        // 本地或 AI 模式直接重置
-        m_engine.startGame();
+    } else if (m_gameMode == NfcHostMode || m_gameMode == NfcClientMode) {
+        if (m_nfcPeer) m_nfcPeer->sendRestart();  // 加上检查
     }
+    // 本地立即重置
+    m_engine.startGame();
+    if (m_isHost)
+        setNetworkStatus("已重新开始，黑棋先走");
+    else
+        setNetworkStatus("已重新开始，您是白棋");
+}
+
+
+
+
+void GameController::onNfcConnected()
+{
+    setNetworkStatus(m_isHost ? "NFC 已连接，黑棋先走" : "NFC 已连接，您是白棋");
+    startGame();
+}
+
+void GameController::onNfcDisconnected()
+{
+    setNetworkStatus("NFC 连接断开");
+    cancelNetwork();
+}
+
+void GameController::onNfcMove(int row, int col)
+{
+    applyRemoteMove(row, col);
+}
+
+void GameController::onNfcChat(const QString &name, const QString &msg)
+{
+    appendChat(name, msg);
+}
+
+void GameController::onNfcGiveUp()
+{
+    if (!m_engine.isGameOver()) {
+        m_engine.endGame("对方认输，您获胜！");
+    }
+}
+
+void GameController::onNfcRestart()
+{
+    m_engine.startGame();
+    setNetworkStatus("对方请求重新开始");
+}
+
+void GameController::onNfcError(const QString &message)
+{
+    setNetworkStatus("NFC 错误：" + message);
+    cancelNetwork();  // cancelNetwork 内部已包含 m_nfcPeer->disconnect()
 }
 
 bool GameController::connectToServer(const QString &ip, quint16 port)
@@ -149,6 +239,8 @@ bool GameController::connectToServer(const QString &ip, quint16 port)
     connect(m_peer, &NetworkPeer::moveReceived, this, &GameController::onPeerMove);
     connect(m_peer, &NetworkPeer::chatReceived, this, &GameController::onPeerChat);
     connect(m_peer, &NetworkPeer::giveUpReceived, this, &GameController::onPeerGiveUp);
+
+     connect(m_peer, &NetworkPeer::restartReceived, this, &GameController::onPeerRestart);
 
     if (!m_peer->connectToHost(ip, port)) {
         delete m_peer;
@@ -163,22 +255,35 @@ bool GameController::connectToServer(const QString &ip, quint16 port)
 
 void GameController::cancelNetwork()
 {
+    // 先断开 NFC 信号的连接，防止循环
+    if (m_nfcPeer) {
+        m_nfcPeer->disconnect();   // 断开所有连接到 NfcPeer 的槽
+    }
+
     if (m_peer) {
         m_peer->disconnect();
         delete m_peer;
         m_peer = nullptr;
     }
+    if (m_nfcPeer) {
+        m_nfcPeer->disconnect();   // 调用 disconnect() 但信号已断开，不会触发槽
+    }
     setNetworkStatus("");
     m_gameMode = LocalMode;
+    m_isHost = false;
 }
 
 void GameController::sendChat(const QString &msg)
 {
     if (msg.trimmed().isEmpty()) return;
     QString name = m_isHost ? "主机" : "客户端";
-    if (m_peer) {
-        m_peer->sendChat(name, msg);
+    if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
+        if (m_peer) m_peer->sendChat(name, msg);
+    } else if (m_gameMode == NfcHostMode || m_gameMode == NfcClientMode) {
+        if (m_nfcPeer) m_nfcPeer->sendChat(name, msg);
     } else {
+        // 本地模式，不发送，只记录
+        appendChat("我", msg);
         return;
     }
     appendChat("我", msg);
@@ -190,6 +295,10 @@ void GameController::giveUp()
 
     if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
         if (m_peer) m_peer->sendGiveUp();
+        QString winner = m_isHost ? "白方" : "黑方";
+        m_engine.endGame(winner + "（对方认输）");
+    } else if (m_gameMode == NfcHostMode || m_gameMode == NfcClientMode) {
+        if (m_nfcPeer) m_nfcPeer->sendGiveUp();
         QString winner = m_isHost ? "白方" : "黑方";
         m_engine.endGame(winner + "（对方认输）");
     } else if (m_gameMode == AIMode) {
@@ -218,11 +327,14 @@ void GameController::onEngineTurnChanged()
 void GameController::onEngineGameOverChanged()
 {
     emit gameStateChanged();
-    if (m_engine.isGameOver() && (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode)) {
-        if (m_peer) m_peer->sendGameOver(m_engine.winnerText());
+    if (m_engine.isGameOver()) {
+        if (m_gameMode == NetworkHostMode || m_gameMode == NetworkClientMode) {
+            if (m_peer) m_peer->sendGameOver(m_engine.winnerText());
+        } else if (m_gameMode == NfcHostMode || m_gameMode == NfcClientMode) {
+            if (m_nfcPeer) m_nfcPeer->sendGameOver(m_engine.winnerText());
+        }
     }
 }
-
 void GameController::onEngineBoardChanged(int row, int col, int player)
 {
     emit boardChanged(row, col, player);

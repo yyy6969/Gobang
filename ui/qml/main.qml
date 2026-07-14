@@ -33,7 +33,6 @@ ApplicationWindow {
             onLanGameStart: {
                 stackView.push(gamePage, { gameMode: "lan" })
             }
-
             onHistoryRequest: {
                 stackView.push(historyPage)
             }

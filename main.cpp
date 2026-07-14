@@ -10,7 +10,7 @@
 #include <QStandardPaths>
 #include "ui/game_controller.h"
 #include "core/databasemanager.h"
-#include "nerwork/nfcmanager.h"
+#include "nerwork/nfc_peer.h"
 
 #ifdef Q_OS_ANDROID
 #include <QJniObject>
@@ -25,6 +25,8 @@ static void onStoragePermissionResult(JNIEnv *env, jobject /*thiz*/, jintArray g
         env->ReleaseIntArrayElements(grantResults, results, 0);
         qDebug() << (granted ? "✅ 存储权限已授予" : "❌ 存储权限被拒绝，请到设置里手动开启");
     }
+
+
 }
 
 static void requestStoragePermissionJNI()
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
 
     GameController gameController;
     DatabaseManager dbmanager;
-    NfcManager nfcManager;
+    NfcPeer nfcManager;
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("nfcManager", &nfcManager);

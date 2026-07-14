@@ -319,6 +319,11 @@ Rectangle {
         }
 
         GameButton {
+            text: "📡 NFC 对战"
+            onClicked: nfcDialog.open()
+        }
+
+        GameButton {
             text: "📜 对战记录"
             onClicked: historyRequest()
         }
@@ -367,78 +372,17 @@ Rectangle {
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
         width: 300
-        height: 380
+        height: 280
 
         property bool isHost: true
         property string serverIp: "127.0.0.1"
         property int port: 8888
-        property string connectionMethod: "ip"
-        property string nfcStatusText: ""
 
-        Timer {
-            id: nfcTimeoutTimer
-            interval: 10000
-            repeat: false
-            onTriggered: {
-                if (lanDialog.connectionMethod === "nfc" && nfcStatusText !== "连接成功") {
-                    nfcStatusText = "连接超时，请重试"
-                    nfcManager.stopNfc()
-                    if (lanDialog.isHost) game.cancelNetwork()
-                }
-            }
-        }
-
-        Connections {
-            target: nfcManager
-            function onHostInfoReceived(ip, port) {
-                nfcTimeoutTimer.stop()
-                lanDialog.nfcStatusText = "连接成功！正在建立游戏..."
-                game.connectToServer(ip, port)
-            }
-            function onErrorOccurred(message) {
-                nfcTimeoutTimer.stop()
-                nfcHintDialog.msgText = "NFC 错误：" + message
-                nfcHintDialog.open()
-                lanDialog.nfcStatusText = "连接失败，请重试"
-            }
-            function onTargetDetected() {
-                lanDialog.nfcStatusText = "已检测到对方设备，正在传输信息..."
-            }
-        }
-
-        Connections {
-            target: game
-            function onNetworkStatusChanged() {
-                if (lanDialog.connectionMethod === "nfc" && game.networkStatus.includes("已连接")) {
-                    nfcTimeoutTimer.stop()
-                    lanDialog.close()
-                    lanGameStart()
-                }
-            }
-        }
-
-        ButtonGroup { id: connectionGroup }
         ButtonGroup { id: roleGroup }
 
         ColumnLayout {
             anchors.fill: parent
             spacing: 10
-
-            RowLayout {
-                spacing: 20
-                Layout.alignment: Qt.AlignHCenter
-                RadioButton {
-                    ButtonGroup.group: connectionGroup
-                    text: "IP连接"
-                    checked: true
-                    onCheckedChanged: { if (checked) lanDialog.connectionMethod = "ip" }
-                }
-                RadioButton {
-                    ButtonGroup.group: connectionGroup
-                    text: "NFC连接"
-                    onCheckedChanged: { if (checked) lanDialog.connectionMethod = "nfc" }
-                }
-            }
 
             RowLayout {
                 spacing: 20
@@ -457,7 +401,6 @@ Rectangle {
             }
 
             ColumnLayout {
-                visible: lanDialog.connectionMethod === "ip"
                 spacing: 10
                 RowLayout {
                     visible: !lanDialog.isHost
@@ -480,67 +423,16 @@ Rectangle {
                 }
             }
 
-            ColumnLayout {
-                visible: lanDialog.connectionMethod === "nfc"
-                Label {
-                    text: lanDialog.nfcStatusText !== "" ? lanDialog.nfcStatusText : "点击确定开始配对"
-                    color: lanDialog.nfcStatusText.startsWith("等待") ? "green" : "gray"
-                    font.italic: true
-                    Layout.alignment: Qt.AlignHCenter
-                }
-            }
-
             RowLayout {
                 spacing: 20
                 Layout.alignment: Qt.AlignRight
                 Button {
                     text: "确定"
-                    onClicked: {
-                        if (lanDialog.connectionMethod === "nfc") {
-                            if (lanDialog.isHost) {
-                                var ip = nfcManager.getLocalIp()
-                                if (ip === "") {
-                                    nfcHintDialog.msgText = "无法获取本机 IP，请检查网络连接"
-                                    nfcHintDialog.open()
-                                    return
-                                }
-                                if (!game.startHost(lanDialog.port)) {
-                                    nfcHintDialog.msgText = "启动服务器失败，端口可能被占用"
-                                    nfcHintDialog.open()
-                                    return
-                                }
-                                if (!nfcManager.startNfc()) {
-                                    nfcHintDialog.msgText = "NFC 启动失败"
-                                    nfcHintDialog.open()
-                                    return
-                                }
-                                nfcManager.sendHostInfo(ip, lanDialog.port)
-                                lanDialog.nfcStatusText = "正在等待对方设备...（请将两部手机背部靠近）"
-                            } else {
-                                if (!nfcManager.startNfc()) {
-                                    nfcHintDialog.msgText = "NFC 启动失败"
-                                    nfcHintDialog.open()
-                                    return
-                                }
-                                lanDialog.nfcStatusText = "正在等待主机信息...（请将两部手机背部靠近）"
-                            }
-                            nfcTimeoutTimer.start()
-                        } else {
-                            lanDialog.accept()
-                        }
-                    }
+                    onClicked: lanDialog.accept()
                 }
                 Button {
                     text: "取消"
-                    onClicked: {
-                        if (lanDialog.connectionMethod === "nfc") {
-                            nfcTimeoutTimer.stop()
-                            nfcManager.stopNfc()
-                            if (lanDialog.isHost) game.cancelNetwork()
-                            lanDialog.nfcStatusText = ""
-                        }
-                        lanDialog.close()
-                    }
+                    onClicked: lanDialog.close()
                 }
             }
         }
@@ -551,13 +443,148 @@ Rectangle {
             lanGameStart()
             close()
         }
-
         onRejected: {
-            if (lanDialog.connectionMethod === "nfc") {
-                nfcManager.stopNfc()
-                lanDialog.nfcStatusText = ""
-            }
             close()
+        }
+    }
+
+    // NFC 对战对话框（独立 NFC 逻辑，暂复用 TCP 通信，为后续纯 NFC 预留）
+    // NFC 对战对话框
+    Dialog {
+        id: nfcDialog
+        modal: true
+        focus: true
+        title: "NFC 对战"
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        width: 300
+        height: 320
+
+        // 角色标识
+        property bool isHost: true
+        // 是否正在连接（用于禁用按钮，防止重复点击）
+        property bool connecting: false
+        // 是否已成功连接（用于判断是否允许清理）
+        property bool connected: false
+
+        ButtonGroup { id: nfcRoleGroup }
+
+        // 监听游戏网络状态
+        Connections {
+            target: game
+            function onNetworkStatusChanged() {
+                // 检查是否连接成功（使用关键词匹配，同时设置 connected 标志）
+                if (game.networkStatus.includes("已连接") ||
+                    game.networkStatus.includes("黑棋先走") ||
+                    game.networkStatus.includes("您是白棋")) {
+
+                    nfcDialog.connected = true    // ✅ 标记已连接
+                    nfcDialog.connecting = false  // ✅ 重置连接中状态
+
+                    // 关闭对话框并触发游戏开始
+                    nfcDialog.close()
+                    lanGameStart()
+                }
+                // 如果出现错误，显示在状态文本中（通过绑定）
+            }
+        }
+
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+
+            // 角色选择
+            RowLayout {
+                spacing: 20
+                Layout.alignment: Qt.AlignHCenter
+                RadioButton {
+                    ButtonGroup.group: nfcRoleGroup
+                    text: "创建房间"
+                    checked: true
+                    onCheckedChanged: { if (checked) nfcDialog.isHost = true }
+                }
+                RadioButton {
+                    ButtonGroup.group: nfcRoleGroup
+                    text: "加入房间"
+                    onCheckedChanged: { if (checked) nfcDialog.isHost = false }
+                }
+            }
+
+            // 状态显示（直接绑定 game.networkStatus）
+            Label {
+                text: game.networkStatus !== "" ? game.networkStatus : "点击确定开始配对"
+                color: game.networkStatus.startsWith("NFC") ? "green" : "gray"
+                font.italic: true
+                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            // 确定/取消按钮
+            RowLayout {
+                spacing: 20
+                Layout.alignment: Qt.AlignRight
+
+                Button {
+                    text: "确定"
+
+                    enabled: !nfcDialog.connecting
+                    onClicked: {
+                        // ✅ 清空旧错误消息
+                        nfcHintDialog.msgText = ""
+                    console.log("NFC 确定按钮被点击，isHost=", nfcDialog.isHost)
+                        nfcDialog.connecting = true
+                        nfcDialog.connected = false
+
+                        if (nfcDialog.isHost) {
+                            var success = game.startNfcHost()
+                            if (!success) {
+                                nfcDialog.connecting = false
+                                nfcHintDialog.msgText = "启动 NFC 服务失败"
+                                nfcHintDialog.open()
+                            }
+                        } else {
+                            var success = game.connectNfcClient()
+                            if (!success) {
+                                nfcDialog.connecting = false
+                                nfcHintDialog.msgText = "连接 NFC 失败"
+                                nfcHintDialog.open()
+                            }
+                        }
+                        // 成功时，状态会由 game.networkStatus 变化触发关闭
+                    }
+                }
+
+                Button {
+                    text: "取消"
+                    onClicked: {
+                        // ✅ 只在未成功连接时才清理网络状态
+                        if (!nfcDialog.connected) {
+                            game.cancelNetwork()
+                        }
+                        nfcDialog.connecting = false
+                        nfcDialog.connected = false
+                        nfcDialog.close()
+                    }
+                }
+            }
+        }
+
+        // ✅ 对话框关闭时清理（只在未成功连接时清理）
+        onRejected: {
+            if (!nfcDialog.connected) {
+                game.cancelNetwork()
+            }
+            nfcDialog.connecting = false
+            nfcDialog.connected = false
+        }
+
+        // ✅ 对话框打开时重置状态
+        onOpened: {
+            nfcDialog.connecting = false
+            nfcDialog.connected = false
+            nfcHintDialog.msgText = ""
         }
     }
 

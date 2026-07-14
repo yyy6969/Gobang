@@ -91,9 +91,70 @@ GameController::startHost(quint16 port) 和 connectToServer(QString ip, quint16 
 
 
 
+------------------------------------关于nfc的开发----未成功实现
 
-NfcManager 使用了 Qt 的 QNearFieldManager 的 P2P 模式（writeNdefMessages / readNdefMessages），
-这在 Android 10+ 已完全失效，因为底层依赖的 Android Beam 已被移除。
-NfcAdapter.setNdefPushMessage 这个方法在 Android 10+ 被标记为弃用
-，在较新的 Android 版本中可能已被彻底移除
-需要调用原生的java代码的api接口
+阶段一：初始方案 — Qt 官方 NFC 模块（QNearFieldManager）
+
+设计思路：使用 Qt6 的 QNearFieldManager + QLlcpServer/QLlcpSocket 实现 NFC P2P 双向通信。
+
+遇到的问题：
+
+    OPPO 系统拦截 NFC 事件：QNearFieldManager::targetDetected 信号永远收不到，NFC 事件被 OPPO 系统服务（com.heytap.accessory）拦截。
+
+    Qt6 已移除 LLCP 支持：QLlcpServer 和 QLlcpSocket 在 Qt6 中已被移除，无法编译。
+
+    改用 Android 原生 enableReaderMode API，通过 JNI 从 C++ 调用 Java 层。
+
+结论：Qt 官方 NFC 模块在 Android 上不可用，必须走 JNI 调用 Android 原生 API。
+-----
+阶段二：改用 enableReaderMode（JNI + Java 辅助类）
+遇到的问题：
+
+    Java 类找不到：QAndroidJniObject 在 Qt6 中已改为 QJniObject，需要适配。
+
+    Context 传递问题：getActivity() 在 Qt6 中方法名变化，改用 getContext()。
+
+    isServer 参数传递：m_helper 在构造函数中创建时 m_isServer 还是默认值 false，导致角色信息丢失。解决方案：将 m_helper 创建推迟到 startServer()/connectToTarget() 中，动态传入角色。
+
+    死循环崩溃：disconnect() → emit disconnected() → onNfcDisconnected() → cancelNetwork() → disconnect() 形成无限递归。解决方案：添加 m_disconnecting 防重入标志，删除 disconnect() 中的 emit disconnected()
+结论：enableReaderMode 可以成功检测到 Tag，且 isServer 角色正确传递
+
+----
+阶段三：尝试 NDEF 写入（手机间 P2P 通信）
+
+设计思路：主机检测到 Tag 后写入 NDEF 握手消息，客户端读取。
+
+遇到的问题：
+
+    Tag 不是 NDEF 格式：日志显示 Tag 不是 NDEF 格式 (Ndef.get(tag) returned null)，对方设备不支持 NDEF 写入。
+
+    enableReaderMode 不支持写入：Android 的 enableReaderMode 是为读取物理 NFC 标签（如卡片）设计的，不支持手机之间的 P2P 写入操作。
+
+尝试的解决方案：
+
+    改用 Android Beam（setNdefPushMessage / CreateNdefMessageCallback）。
+
+结论：enableReaderMode 只能读取，无法在手机间写入 NDEF。手机间的 NDEF 传输必须走 Android Beam
+
+
+
+阶段四：尝试 Android Beam（官方 P2P 方案）
+
+设计思路：使用 setNdefPushMessage 或 CreateNdefMessageCallback 实现手机间 NDEF 推送。
+
+遇到的问题：
+
+    setNdefPushMessage 找不到：编译错误 找不到符号 setNdefPushMessage，该方法在 Android 10+ 已被移除。
+
+    CreateNdefMessageCallback 过时：NfcAdapter.CreateNdefMessageCallback 已过时，且 createNdefMessage(NfcEvent) 签名变化。
+
+    setNdefPushMessageCallback 找不到：该方法同样在 Android 10+ 被移除。
+
+目前开发推测最终结论：Android Beam 相关 API 在 Android 10（API 29）起已被 Google 废弃，在 Android 14 中彻底移除，OPPO 等厂商的定制系统可能更早移除了这些 API，导致目前开发没有成功
+
+
+
+------------------------------
+
+
+

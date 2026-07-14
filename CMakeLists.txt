@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.19)
 project(Gonbal_My_Game)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2 Network Sql)
+set(ANDROID_MIN_SDK_VERSION 21)
+set(ANDROID_TARGET_SDK_VERSION 34)   # 或 33、35
+find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2 Network  Nfc  Sql)
 
 qt_standard_project_setup()
 
@@ -35,7 +37,8 @@ qt_add_executable(Gonbal_My_Game
     core/databasemanager.h core/databasemanager.cpp
 
 
-    nerwork/nfcmanager.h nerwork/nfcmanager.cpp
+    nerwork/nfc_peer.h nerwork/nfc_peer.cpp
+    android/src/com/Gonbal_My_Game/NfcReaderHelper.java
 
 
 

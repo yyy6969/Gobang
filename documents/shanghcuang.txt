@@ -1,0 +1,245 @@
+I/.Gonbal_My_Game: isSwordfishLaunchAppEnabled_ 0 isSwordfishInstallAppEnabled_ 0
+I/.Gonbal_My_Game: Late-enabling -Xcheck:jni
+E/.Gonbal_My_Game: Unknown bits set in runtime_flags: 0x40000000
+I/.Gonbal_My_Game: Using CollectorTypeCMC GC.
+D/nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+W/libc    : Access denied finding property "persist.vendor.sys.activitylog"
+I/OneTrace: Mark active for pid=8391? true
+D/cutils-dev: otrace_set_tracing_enabled? true tag:0
+D/cutils-dev: properties changed in otrace_seq_number_changed!
+D/OplusActivityManager: get AMS extension: android.os.BinderProxy@41ae5a8
+D/SurfaceSyncGroup: preCreateSurfaceSyncGroupTimerThread
+D/CompactWindowAppManager: initCompactApplicationInfo CompactMode: , NormalMode:
+D/ColorModeChangeItem: preExecute mColorMode=0
+D/OplusScrollToTopManager: setIsInWhiteList false
+D/OplusViewDebugManager: OplusViewDebugManager Constructor android.view.debug.OplusViewDebugManager@55b5866 [mHasViewDebugProperty true] [mHasMsgDebugProperty false] [DEBUG false] [EXTRAINFOENABLE false] [LIGHT_OS false]
+W/libc    : Access denied finding property "ro.odm.prev.product.name"
+W/ziparchive: Unable to open '/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.dm': No such file or directory
+W/ziparchive: Unable to open '/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.dm': No such file or directory
+D/nativeloader: Configuring clns-7 for other apk /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64:/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.Gonbal_My_Game
+V/GraphicsEnvironment: Currently set values for:
+V/GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+V/GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+V/GraphicsEnvironment: Global.Settings values are invalid: number of packages: 0, number of values: 0
+V/GraphicsEnvironment: Updatable production driver is not supported on the device.
+D/ResourcesManagerExtImpl: applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:-1
+D/OplusGraphicsEvent: OplusGraphicsEventListener create now!
+D/OplusGraphicsEvent: addEventListener success!
+I/HWUI    : SupportApps size 0
+D/ResourcesManagerExtImpl: applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+D/ExtensionsLoader: createInstance(64bit) : createExtendedFactory
+D/ExtensionsLoader: Opened libSchedAssistExtImpl.so
+E/SchedAssist: sysOpen failed with error=Permission denied
+E/SchedAssist: open sharedFd failed with error=Permission denied
+E/SchedAssist: open sharedFd failed with error=Permission denied
+E/SchedAssist: open sharedFd failed with error=Permission denied
+E/SchedAssist: open sharedFd failed with error=Permission denied
+I/AdrenoGLES-0: QUALCOMM build                   : bed5577c68, Ie96e56eb79
+I/AdrenoGLES-0: Build Date                       : 04/11/25
+I/AdrenoGLES-0: OpenGL ES Shader Compiler Version: E031.45.02.25
+I/AdrenoGLES-0: Local Branch                     :
+I/AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.14.3.0.11.00.00.973.853
+I/AdrenoGLES-0: Remote Branch                    : NONE
+I/AdrenoGLES-0: Reconstruct Branch               : NOTHING
+I/AdrenoGLES-0: Build Config                     : S P 16.1.2 AArch64
+I/AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+I/AdrenoGLES-0: Driver Version                   : 0762.34
+I/AdrenoGLES-0: Process Name                     : com.Gonbal_My_Game
+I/AdrenoGLES-0: PFP: 0x01310181, ME: 0x00000000
+I/AdrenoUtils: <ReadGpuID:357>: Reading chip ID through GSL
+W/ziparchive: Unable to open '/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.dm': No such file or directory
+W/ziparchive: Unable to open '/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.dm': No such file or directory
+Art: Cleared App Profiles.
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libc++_shared.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6Core_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+I/QtCore  : Start
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6Gui_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6Network_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6Nfc_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6OpenGL_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6Qml_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QmlModels_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QmlWorkerScript_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QmlMeta_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6Quick_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickTemplates2_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6Sql_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2Impl_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2BasicStyleImpl_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2Basic_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2FusionStyleImpl_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2Fusion_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2ImagineStyleImpl_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2Imagine_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2MaterialStyleImpl_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2Material_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2UniversalStyleImpl_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2Universal_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickControls2FluentWinUI3StyleImpl_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickEffects_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickLayouts_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libQt6QuickShapes_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libplugins_platforms_qtforandroid_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+I/Qt      : Qt platform plugin started
+D/nativeloader: Load /data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/lib/arm64/libGonbal_My_Game_arm64-v8a.so using ns clns-7 from class loader (caller=/data/app/~~z6IrCDjcDD4nnLe3TrCZYw==/com.Gonbal_My_Game-9eoJOMn_2ysDOIC2GKZM1Q==/base.apk): ok
+D/OplusInputMethodUtil: init sDebug to false, init sDebugIme to false, init sAlwaysOn to false
+D/OplusInputMethodUtil: updateDebugToClass InputMethodManager.DEBUG = false
+D/OplusInputMethodUtil: updateDebugToClass ImeFocusController.DEBUG = false
+D/OplusInputMethodUtil: updateDebugToClass InsetsController.DEBUG = false
+D/OplusInputMethodUtil: updateDebugToClass BaseInputConnection.DEBUG = false
+I/oplus.android.OplusFrameworkFactoryImpl: Unknow feature:IOplusTextViewRTLUtilForUG
+D/ScrollOptimizationHelper: can't find the config file for optimizaiton
+D/ScrollOptimizationHelper: will not debug for debug is false
+I/oplus.android.OplusFrameworkFactoryImpl: get feature:IOplusDynamicVsyncFeature
+I/oplus.android.OplusFrameworkFactoryImpl: get feature:IOplusDynamicVsyncFeature
+I/oplus.android.OplusFrameworkFactoryImpl: get feature:IOplusDynamicVsyncFeature
+E/OplusCustomizeRestrictionManager: sInstance is null, start a new sInstance
+D/ActivityThread: ComponentInfo{com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity} checkFinished=false 2
+D/ResourcesManagerExtImpl: applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+D/WindowManager: Add to mViews: com.android.internal.policy.DecorView{9dba15b I.ED..... R.....ID 0,0-0,0 alpha=1.0 viewInfo = }[QtActivity],pkg= com.Gonbal_My_Game
+D/ExtensionsLoader: createInstance(64bit) : createExtendedFactory
+D/ExtensionsLoader: Opened libhwuiextimpl.so
+D/skia    : setRusSupported enable 0
+D/ExtensionsLoader: createInstance(64bit) : createExtendedFactory
+D/ExtensionsLoader: Opened libSchedAssistExtImpl.so
+D/ViewRootImplExtImpl: onDisplayChanged -1 for VRI android.view.ViewRootImpl@528f837
+D/ResourcesManagerExtImpl: applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+I/Choreographer: Skipped 96 frames!  The application may be doing too much work on its main thread.
+E/OplusBracketLog: [OplusViewMirrorManager] updateHostViewRootIfNeeded, not support android.view.ViewRootImpl@528f837
+D/ViewRootImplExtImpl: wrapConfigInfoIntoFlags rotation=0, smallestScreenWidthDp=0, residentWS=false, scenario=0, bounds=Rect(0, 0 - 1264, 2780), relayoutAsync=false, flags=0, newFlags=1457520640, title=com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity
+D/VRI[QtActivity]: relayoutWindow result, sizeChanged:true, surfaceControlChanged:false, transformHintChanged:false, mSurfaceSize:Point(1264, 2780), mLastSurfaceSize:Point(0, 0), mWidth:-1, mHeight:-1, requestedWidth:1264, requestedHeight:2780, transformHint:0, installOrientation:0, displayRotation:0, isSurfaceValid:false, attr.flag:-2122252032, tmpFrames:ClientWindowFrames{frame=[0,0][1264,2780] display=[0,0][1264,2780] parentFrame=[0,0][0,0]}, relayoutAsync:false, mSyncSeqId:0
+I/DynamicFramerate [FRTCConfigManager]: initFrameRateConfig:
+I/DynamicFramerate [FRTCConfigManager]: 	levelsFor120hz: [120, 60]
+I/DynamicFramerate [FRTCConfigManager]: 	thresholdsFor120hz: [200]
+I/DynamicFramerate [FRTCConfigManager]: 	levelsFor90hz: [90]
+I/DynamicFramerate [FRTCConfigManager]: 	thresholdsFor90hz: []
+I/DynamicFramerate [FRTCConfigManager]: FRTCConfigManager: FRTC_CAPABILITY = 120, package name = com.Gonbal_My_Game, WINDOW_ANIMATION_SPEED_RATE = 10, SCROLL_ANIMATION_SPEED_RATE = 20, PACKAGE_ENABLE = false
+I/DynamicFramerate [DynamicFrameRateController]: init info: mPackageName = com.Gonbal_My_Game, mIsEnabled = false
+D/VRI[QtActivity]: setWindowStopped stopped:true
+D/HWUI    : RenderThread::destroyRenderingContext: this=0xb400007911e04700
+D/HWUI    : SkiaOpenGLPipeline::onContextDestroyed: this=0xb400007a36b1b500
+D/HWUI    : EglManager::destroy: mEglDisplay=0xb400007a36b16dc0, mEglContext=0xb400007a3688dc00, mCurrentSurface=0x0
+Art: Compiled App Profiles.
+I/AdrenoGLES-0: QUALCOMM build                   : bed5577c68, Ie96e56eb79
+I/AdrenoGLES-0: Build Date                       : 04/11/25
+I/AdrenoGLES-0: OpenGL ES Shader Compiler Version: E031.45.02.25
+I/AdrenoGLES-0: Local Branch                     :
+I/AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.14.3.0.11.00.00.973.853
+I/AdrenoGLES-0: Remote Branch                    : NONE
+I/AdrenoGLES-0: Reconstruct Branch               : NOTHING
+I/AdrenoGLES-0: Build Config                     : S P 16.1.2 AArch64
+I/AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+I/AdrenoGLES-0: Driver Version                   : 0762.34
+I/AdrenoGLES-0: Process Name                     : com.Gonbal_My_Game
+I/AdrenoGLES-0: PFP: 0x01310181, ME: 0x00000000
+D/VRI[QtActivity]: dispatchAppVisibility visible:true
+D/ColorModeChangeItem: preExecute mColorMode=0
+D/VRI[QtActivity]: setWindowStopped stopped:false
+D/ProfileInstaller: Installing profile for com.Gonbal_My_Game
+D/ActivityThread: ComponentInfo{com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity} checkFinished=false 2
+D/ResourcesManagerExtImpl: applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+D/ViewRootImplExtImpl: wrapConfigInfoIntoFlags rotation=0, smallestScreenWidthDp=0, residentWS=false, scenario=0, bounds=Rect(0, 0 - 1264, 2780), relayoutAsync=false, flags=0, newFlags=1457520640, title=com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity
+D/VRI[QtActivity]: relayoutWindow result, sizeChanged:false, surfaceControlChanged:true, transformHintChanged:false, mSurfaceSize:Point(1264, 2780), mLastSurfaceSize:Point(1264, 2780), mWidth:1264, mHeight:2780, requestedWidth:1264, requestedHeight:2780, transformHint:0, installOrientation:0, displayRotation:0, isSurfaceValid:true, attr.flag:-2122252032, tmpFrames:ClientWindowFrames{frame=[0,0][1264,2780] display=[0,0][1264,2780] parentFrame=[0,0][0,0]}, relayoutAsync:false, mSyncSeqId:0
+W/VRI[QtActivity]: updateBlastSurfaceIfNeeded, surfaceSize:Point(1264, 2780), lastSurfaceSize:Point(1264, 2780), format:-1, blastBufferQueue:null
+D/BufferQueueConsumer: [](id:20c700000000,api:0,p:-1,c:8391) connect: controlledByApp=false
+D/HWUI    : createSurface new attribs array
+D/libEGL  : this is from skia gles
+D/BufferQueueProducer: [VRI[QtActivity]#0(BLAST Consumer)0](id:20c700000000,api:1,p:8391,c:8391) connect: api=1 producerControlledByApp=true
+I/SurfaceControl:  setExtendedRangeBrightness sc=Surface(name=com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity)/@0x818b72f,currentBufferRatio=1.0,desiredRatio=1.0
+D/BLASTBufferQueue: [VRI[QtActivity]#0](f:0,a:1) acquireNextBufferLocked size=1264x2780 mFrameNumber=1 applyTransaction=true mTimestamp=21288297261148(auto) mPendingTransactions.size=0 graphicBufferId=36039070580736 transform=0
+D/VRI[QtActivity]: Received frameCommittedCallback lastAttemptedDrawFrameNum=1 didProduceBuffer=true syncBuffer=false
+D/ExtensionsLoader: createInstance(64bit) : createExtendedFactory
+D/ExtensionsLoader: Opened libSchedAssistExtImpl.so
+D/VRI[QtActivity]: draw finished. seqId=0
+D/ResourcesManagerExtImpl: applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+D/default : Data path: "/data/user/0/com.Gonbal_My_Game/files"
+D/VRI[QtActivity]: onFocusEvent true
+W/VRI[QtActivity]: handleResized abandoned!
+D/default : getUserName called
+I/.Gonbal_My_Game: Compiler allocated 7152KB to compile void android.view.ViewRootImpl.performTraversals()
+D/default : getUserName called
+I/SurfaceView: 254794174 onAttachedToWindow
+D/ViewRootImplExtImpl: wrapConfigInfoIntoFlags rotation=0, smallestScreenWidthDp=361, residentWS=false, scenario=0, bounds=Rect(0, 0 - 1264, 2780), relayoutAsync=true, flags=0, newFlags=1457532192, title=com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity
+D/VRI[QtActivity]: relayoutWindow result, sizeChanged:false, surfaceControlChanged:false, transformHintChanged:false, mSurfaceSize:Point(1264, 2780), mLastSurfaceSize:Point(1264, 2780), mWidth:1264, mHeight:2780, requestedWidth:1264, requestedHeight:2780, transformHint:0, installOrientation:0, displayRotation:0, isSurfaceValid:true, attr.flag:-2122252032, tmpFrames:ClientWindowFrames{frame=[0,0][1264,2780] display=[0,0][1264,2780] parentFrame=[0,0][1264,2780]}, relayoutAsync:true, mSyncSeqId:0
+W/VRI[QtActivity]: updateBlastSurfaceIfNeeded, surfaceSize:Point(1264, 2780), lastSurfaceSize:Point(1264, 2780), format:-3, blastBufferQueue:android.graphics.BLASTBufferQueue@986a335
+D/SurfaceView: 254794174, SurfaceView[com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity], layerid: 7640 createBlastSurfaceControls
+D/BufferQueueConsumer: [](id:20c700000001,api:0,p:-1,c:8391) connect: controlledByApp=false
+D/ViewRootImplExtImpl: showSurfaceViewBackground subLayer:-2, name:com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity
+I/SurfaceView: 254794174 visibleChanged -- surfaceCreated
+D/Surface : Surface::dispatchSetGameApi
+D/Surface : dispatchSetGameApi pid[8391] tid[9112] GameApi[0]
+D/Surface : dispatchSetGameApi res:0
+D/libEGL  : set game api gles successfully
+D/BufferQueueProducer: [SurfaceView[com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity]#1(BLAST Consumer)1](id:20c700000001,api:1,p:8391,c:8391) connect: api=1 producerControlledByApp=true
+D/SurfaceView: 254794174 handleSyncNoBuffer
+D/SurfaceView: 254794174 finishedDrawing
+D/SurfaceView: 254794174 performDrawFinished mAttachedToWindow true
+I/SurfaceControl:  setExtendedRangeBrightness sc=Surface(name=com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity)/@0x818b72f,currentBufferRatio=1.0,desiredRatio=1.0
+D/SurfaceView: 254794174 dispatchDraw mDrawFinished true isAboveParent false (mPrivateFlags & PFLAG_SKIP_DRAW) 128
+D/SurfaceView: 254794174 clearSurfaceViewPort mCornerRadius 0.0
+D/BufferQueueProducer: [SurfaceView[com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity]#1(BLAST Consumer)1](id:20c700000001,api:1,p:8391,c:8391) disconnect: api 1
+D/Surface : Surface::dispatchSetGameApi
+D/Surface : dispatchSetGameApi res:0
+D/libEGL  : set game api gles successfully
+D/BufferQueueProducer: [SurfaceView[com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity]#1(BLAST Consumer)1](id:20c700000001,api:1,p:8391,c:8391) connect: api=1 producerControlledByApp=true
+D/BLASTBufferQueue: [SurfaceView[com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity]#1](f:0,a:1) acquireNextBufferLocked size=1264x2780 mFrameNumber=1 applyTransaction=true mTimestamp=21288761385575(auto) mPendingTransactions.size=0 graphicBufferId=36039070580741 transform=0
+D/InsetsController: hide(ime(), fromIme=false)
+I/ImeTracker: com.Gonbal_My_Game:918ae907: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+I/ImeTracker: com.Gonbal_My_Game:918ae907: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+W/default : qrc:/ui/qml/MainMenu.qml:203: ReferenceError: difficultyText is not defined
+D/OplusScrollToTopManager: com.Gonbal_My_Game/org.qtproject.qt.android.bindings.QtActivity,This com.android.internal.policy.DecorView{9dba15b V.ED..... R....... 0,0-1264,2780 aid=0 alpha=1.0 viewInfo = }[QtActivity] change focus to true
+I/.Gonbal_My_Game: _Desupression native alloc gc_urgency: 76326 native bytes: 38285321
+I/.Gonbal_My_Game: gc_priority_optimize set prio success0
+I/.Gonbal_My_Game: gc_priority_optimize set prio success0
+I/.Gonbal_My_Game: gc_priority_optimize set prio success0
+I/.Gonbal_My_Game: gc_priority_optimize set prio success0
+V/AutofillManager: requestHideFillUi(null): anchor = null
+D/InsetsController: hide(ime(), fromIme=false)
+I/ImeTracker: com.Gonbal_My_Game:bce4bd18: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+I/ImeTracker: com.Gonbal_My_Game:bce4bd18: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/OplusInputMethodManagerInternal: get inputMethodManager extension: com.android.internal.view.IInputMethodManager$Stub$Proxy@b831222
+D/OplusViewDragTouchViewHelper: dispatchTouchView action = 1
+D/ViewRootImplExtImpl: the up motion event handled by client, just return
+D/InsetsController: hide(ime(), fromIme=false)
+I/ImeTracker: com.Gonbal_My_Game:ad82a771: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+I/ImeTracker: com.Gonbal_My_Game:ad82a771: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+V/AutofillManager: requestHideFillUi(null): anchor = null
+D/InsetsController: hide(ime(), fromIme=false)
+I/ImeTracker: com.Gonbal_My_Game:4e10470c: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+I/ImeTracker: com.Gonbal_My_Game:4e10470c: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/OplusViewDragTouchViewHelper: dispatchTouchView action = 1
+D/ViewRootImplExtImpl: the up motion event handled by client, just return
+V/AutofillManager: requestHideFillUi(null): anchor = null
+D/InsetsController: hide(ime(), fromIme=false)
+I/ImeTracker: com.Gonbal_My_Game:811631c7: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+I/ImeTracker: com.Gonbal_My_Game:811631c7: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/OplusViewDragTouchViewHelper: dispatchTouchView action = 1
+D/ViewRootImplExtImpl: the up motion event handled by client, just return
+V/AutofillManager: requestHideFillUi(null): anchor = null
+D/InsetsController: hide(ime(), fromIme=false)
+I/ImeTracker: com.Gonbal_My_Game:b3be89d9: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+I/ImeTracker: com.Gonbal_My_Game:b3be89d9: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/OplusViewDragTouchViewHelper: dispatchTouchView action = 1
+D/ViewRootImplExtImpl: the up motion event handled by client, just return
+D/qml     : NFC 确定按钮被点击，isHost= true
+D/InsetsController: hide(ime(), fromIme=false)
+I/ImeTracker: com.Gonbal_My_Game:26781379: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+I/ImeTracker: com.Gonbal_My_Game:26781379: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/default : [GameController] startNfcHost called
+D/NfcReaderHelper: === Constructor called, ptr=-5476376626891262016, context=org.qtproject.qt.android.bindings.QtActivity@2ab5655, isServer=true
+D/NfcReaderHelper: Getting NFC adapter...
+D/NfcReaderHelper: NFC adapter obtained: android.nfc.NfcAdapter@ea144b3
+D/NfcReaderHelper: === NfcReaderHelper created successfully, ptr=-5476376626891262016
+D/NfcReaderHelper: === enableReaderMode called ===
+D/NfcReaderHelper: Context class: org.qtproject.qt.android.bindings.QtActivity
+D/NfcReaderHelper: Successfully cast Context to Activity
+D/NfcReaderHelper: enableReaderMode success
+D/NfcReaderHelper: === onTagDiscovered CALLED ===
+D/NfcReaderHelper: Tag ID: 01 02 03 04
+D/NfcReaderHelper: Tag tech list: android.nfc.tech.IsoDep, android.nfc.tech.NfcA
+D/NfcReaderHelper: === writeHandshakeMessage ===
+D/NfcReaderHelper: Tag 不是 NDEF 格式，尝试格式化...
+E/NfcReaderHelper: Tag 既不是 NDEF 也不可格式化
+D/NfcReaderHelper: === disableReaderMode called ===
+D/NfcReaderHelper: disableReaderMode success

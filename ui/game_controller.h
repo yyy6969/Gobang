@@ -3,12 +3,20 @@
 
 #include <QObject>
 #include "../core/gomoku_engine.h"
+#include"../nerwork/nfc_peer.h"
 
+
+
+// 游戏模式枚举：本地、AI、网络主机、网络客户端
+enum GameMode { LocalMode, AIMode, NetworkHostMode, NetworkClientMode, NfcHostMode, NfcClientMode };
 class NetworkPeer;
 
 class GameController : public QObject
 {
     Q_OBJECT   // 启用 Qt 元对象特性，支持信号槽和属性系统
+
+
+
 
     // 暴露给 QML 的属性：当前轮到谁（0黑1白）
     Q_PROPERTY(int currentPlayer READ currentPlayer NOTIFY gameStateChanged)
@@ -26,9 +34,23 @@ class GameController : public QObject
     Q_PROPERTY(QString chatHistory READ chatHistory NOTIFY chatHistoryChanged)
     // 暴露的游戏步数
     Q_PROPERTY(int movesCount READ movesCount NOTIFY gameStateChanged)
+
+
+
+
+
+
+
+
 public:
-    // 游戏模式枚举：本地、AI、网络主机、网络客户端
-    enum GameMode { LocalMode, AIMode, NetworkHostMode, NetworkClientMode };
+
+    // 新增 NFC 专用方法
+    Q_INVOKABLE bool startNfcHost(); // port 保留但实际NFC不用，可忽略
+    Q_INVOKABLE bool connectNfcClient();
+
+
+
+
     Q_ENUM(GameMode)
 
     // AI 难度枚举：简单、一般、困难
@@ -115,7 +137,29 @@ private slots:
     // 收到对端重启请求
     void onPeerRestart();
 
+
+
+
+
+
+
+
+
+    void onNfcConnected();
+    void onNfcDisconnected();
+    void onNfcMove(int row, int col);
+    void onNfcChat(const QString &name, const QString &msg);
+    void onNfcGiveUp();
+    void onNfcRestart();
+    void onNfcError(const QString &msg);
+
 private:
+
+
+    NfcPeer *m_nfcPeer;        // 新增
+
+
+
     // 游戏引擎实例（负责棋盘逻辑、胜负判定、计时）
     GameEngine m_engine;
     // 当前游戏模式（取 GameMode 枚举值）
@@ -142,6 +186,8 @@ private:
     void applyRemoteMove(int row, int col);
     // 追加聊天记录（本地显示）
     void appendChat(const QString &name, const QString &msg);
+
+
     // 触发 AI 走棋（根据当前难度）
     void aiMove();
 
