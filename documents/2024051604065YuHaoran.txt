@@ -1,0 +1,186 @@
+开发文档（开发部分以及依赖的技术）
+
+1.1 UI 层包括以下主要部分：
+
+    页面容器（StackView）管理页面切换。
+
+    主菜单页（MainMenu.qml）提供游戏模式入口、昵称设置和历史记录查看。
+
+    游戏页（GameView.qml）展示棋盘、计时、回合状态、网络聊天，并处理落子交互。
+
+    历史记录页（HistoryView.qml）以列表形式显示本地存储的对局记录。
+
+所有页面共享同一个 GameController 和 DatabaseManager 实例，通过属性注入的方式传递，保证了数据的一致性。
+1.2 页面导航与 StackView 管理
+
+main.qml 作为应用入口，创建了全局的 StackView 并管理页面栈。初始页面为主菜单页，用户操作后通过 push 推入游戏页或历史记录页，返回时通过 pop 回到上级页面。
+每个页面都定义为 Component，并在信号中执行页面切换，例如主菜单的 onLocalGame 信号触发：
+向游戏页传递 gameMode 和 isHost 属性，以便页面初始化时设置正确的模式。
+GameView 的 backToMenu 信号会调用 game.cancelNetwork() 清理网络连接，再 pop 返回。
+1.3 主菜单页（MainMenu.qml）
+1.3.1 功能概述
+
+主菜单页是用户进入游戏的第一界面，提供以下功能：
+
+    显示用户昵称（设置用户名）
+
+    设置对话框：修改昵称并保存到数据库。
+
+    AI 难度选择对话框：通过滑块选择简单/一般/困难。（一开始使用按钮选择）
+
+    五个游戏入口按钮：本地对战、人机对战、局域网对战、NFC 对战、对战记录。
+
+    局域网和 NFC 连接前的提示对话框及连接参数配置。
+1.3.2 属性与信号
+    属性：
+
+        userName：当前用户昵称，从 dbManager 读取，修改后更新显示。
+
+        game 和 dbManager：由父级注入的 C++ 对象引用。
+
+    信号：
+
+        localGame()：点击本地对战按钮时发射，通知父级切换到本地模式。
+
+        aiGame(int difficulty)：点击人机对战并确认难度后发射，携带难度值。
+
+        lanGameStart()：局域网或 NFC 连接成功后发射，通知父级进入游戏页。
+
+        historyRequest()：点击对战记录按钮时发射，切换到历史记录页
+1.3.3 核心交互流程
+
+    设置昵称：点击图标打开 settingsDialog，输入新昵称后点击“保存设置”，调用 dbManager.setUserName() 并刷新显示。
+
+    选择游戏模式：
+
+        本地：直接发射 localGame 信号。
+
+        人机：打开 aiDifficultyDialog，滑块选择难度，确认后发射 aiGame(difficulty)。
+
+        局域网：先弹出 hotspotHintDialog 提示网络准备，确认后打开 lanDialog 选择角色（创建/加入）和 IP/端口，点击确定调用 game.startHost(port) 或 game.connectToServer(ip, port)，成功后发射 lanGameStart。
+
+        NFC：打开 nfcDialog，选择创建/加入房间，点击确定调用 game.startNfcHost() 或 game.connectNfcClient()，通过监听 game.networkStatus 判断连接成功后自动关闭对话框并发射 lanGameStart。
+
+1.3.4 界面布局
+
+    背景使用半透明图片，居中显示游戏标题和按钮列。
+
+    所有按钮使用自定义组件 GameButton，统一风格。
+
+    对话框均采用 Dialog 模态组件，居中弹出。
+1.4 游戏页（GameView.qml）
+1.4.1 功能概述
+
+游戏页是核心对局界面，需适配三种模式（本地、人机、局域网/NFC）。主要功能包括：
+
+    绘制 15×15 围棋棋盘并显示棋子（Canvas 实现）。
+
+    显示当前回合（黑/白）、双方剩余时间、游戏模式标签。
+
+    提供认输按钮（仅非本地模式）和返回菜单按钮。
+
+    集成 BoardInputHandler 处理用户落子（后期由易俊辰完成）。
+
+    局域网模式下提供聊天面板（可展开/收起）。
+
+    游戏结束时弹出遮罩显示获胜者，并提供“重新开始”和“返回菜单”按钮。
+
+    自动保存对局记录（在 game.gameOverChanged 时调用 dbManager.saveGameRecord）。
+
+1.4.2 属性与信号
+
+    属性：
+
+        gameMode：由父级传入，取值 "local"、"ai"、"lan"。
+
+        isHost：联网模式下是否为主机（执黑）。
+
+        game、dbManager：C++ 对象引用。
+
+        动态布局属性：cellSize、boardX、boardY 等根据窗口尺寸自适应计算。
+
+    信号：
+
+        backToMenu()：点击返回或游戏结束返回菜单时发射。
+
+1.4.3 棋盘绘制（Canvas）
+
+    在 onPaint 中绘制网格线、星位、所有棋子（通过 game.pieceAt(row,col) 获取状态）。
+
+    棋子使用径向渐变模拟立体感，并添加高光。
+
+    最后落子位置用红色小圆标记（通过 lastRow/lastCol 属性记录）。
+
+    绑定 game 的 boardChanged 和 gameStateChanged 信号，触发重绘。
+
+    局域网模式下启动定时器（500ms）强制刷新，以应对网络延迟导致的状态更新滞后。
+
+1.4.4 聊天面板
+
+    仅在 gameMode === "lan" 且网络状态非空时显示。
+
+    点击右下角聊天气泡按钮展开面板，再次点击或点击右上角关闭按钮收起。
+
+    输入框支持回车发送，消息通过 game.sendChat(msg) 发送，并自动追加到 game.chatHistory 中显示。
+
+    聊天区域滚动到底部（cursorPosition = length）自动显示最新消息。
+
+1.4.5 游戏结束与记录保存
+
+    当 game.gameOver 为真时，显示半透明遮罩，展示 game.winnerText。
+
+    “重新开始”按钮调用 game.requestRestart()（网络模式会通知对方重置）。
+
+    通过 Connections 监听 game.gameOverChanged，在游戏结束时构造记录数据并调用 dbManager.saveGameRecord()。
+
+    记录内容包括玩家名（从 dbManager 获取）、对手名（根据模式固定）、胜者（解析 winnerText）、步数。
+
+1.5 历史记录页（HistoryView.qml）
+1.5.1 功能概述
+
+    以列表形式展示 dbManager.getAllRecords() 返回的所有对局记录，按时间降序排列。
+
+    每条记录显示：玩家 vs 对手、胜者、步数、时间。
+
+    空状态显示“暂无对战记录”提示。
+
+    提供返回按钮回到主菜单。
+
+1.5.2 数据加载
+
+    Component.onCompleted 中调用 dbManager.getAllRecords()，将返回的 QVariantList 直接赋值给 ListView 的 model。
+
+    委托使用 modelData 访问每个 QVariantMap 中的字段。
+
+2.1 模块概述
+
+数据库模块基于 Qt SQL 框架，使用 SQLite 作为嵌入式关系数据库引擎，负责游戏客户端本地数据的持久化存储。该模块完全独立于其他业务模块，仅提供数据存取接口
+
+主要功能：
+
+    存储与读取用户昵称（settings 表）
+
+    保存游戏对局记录（game_records 表）
+
+    查询全部历史记录（按时间降序）
+
+    清空所有记录
+2.1 生命周期管理
+
+    构造函数自动完成数据库文件路径定位、目录创建、连接打开和表初始化。若任何一步失败，会输出警告但不会抛出异常，调用方需检查返回值（如 initialize() 或后续操作是否成功）。
+
+    析构函数负责关闭数据库连接，释放资源。
+设计决策：
+    静态变量在进程生命周期内持续有效，适用于单例模式（本应用中 DatabaseManager 在 main.qml 中只创建一个实例）。
+
+    时限设为 10 秒，考虑到一局游戏结束到保存记录的间隔通常在秒级，且同一玩家对不可能在 10 秒内连续结束两局，因此可以有效拦截因信号重复触发导致的重复插入。
+
+    若确需立即保存另一局相同玩家对的记录，可等待 10 秒以上，或调用 clearAllRecords() 后重新保存。
+2.2
+    插入时使用 DEFAULT CURRENT_TIMESTAMP，SQLite 以 UTC 存储。
+
+    查询时使用 QDateTime::toLocalTime() 转换为系统时区，再格式化为 "yyyy-MM-dd hh:mm:ss" 字符串，便于 UI 直接显示。
+
+    若需支持不同时区显示，可进一步调整格式化方式。
+
+总结：大部分ui界面是我在core完成后，根据基础逻辑建立的ui界面，最开始是做的桌面端ui,后面移植到手机端后重做并优化了ui界面，对手机端屏幕大小做了适应并且让其更有古风韵味一点我主色调使用浅色调，然后使用SQLlite本地存储对战记录以及用户自己设置的用户名，遇见最大的问题是对战记录会重复记录，并且由于前者core核心复杂不方便改正，我设置了时限10s。
