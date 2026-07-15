@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    // 用私有目录，完全不申请权限
+
     qDebug() << "Data path:" << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
     QQmlApplicationEngine engine;

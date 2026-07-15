@@ -15,8 +15,8 @@
 │       └── BoardInputHandler.qml      # 棋盘输入处理器
 ├── nerwork/                           # 网络通信模块
 │   ├── network_player.h / .cpp        # 对等端 TCP 通信（服务器/客户端合一）
-│   ├── game_client.h / .cpp           # （推测为旧版客户端）
-│   └── game_server.h / .cpp           # （推测为旧版服务器）
+│   ├── game_client.h / .cpp           # 旧版客户端
+│   └── game_server.h / .cpp           # 旧版服务器
 ├── nfcmanager.h / .cpp                # Android NFC 管理（JNI 封装）
 ├── android/                           # Android 平台打包资源
 │   └── （包含 AndroidManifest.xml 等自定义文件）
